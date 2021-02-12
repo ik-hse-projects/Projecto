@@ -1,4 +1,6 @@
 ﻿using System;
+using Thuja;
+using Thuja.Widgets;
 
 namespace Projecto.Tui
 {
@@ -7,7 +9,7 @@ namespace Projecto.Tui
         static void Main(string[] args)
         {
             var project = new Project();
-            Console.WriteLine("Hello World!");
+            new MainLoop(new Label("Hello world!")).Start();
         }
     }
 }

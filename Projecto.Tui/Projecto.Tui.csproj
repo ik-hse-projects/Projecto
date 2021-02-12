@@ -7,6 +7,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Projecto\Projecto.csproj" />
+      <ProjectReference Include="..\Thuja\Thuja.csproj" />
     </ItemGroup>
 
 </Project>
