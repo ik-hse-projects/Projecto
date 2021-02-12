@@ -4,13 +4,33 @@ using System.Collections.Generic;
 namespace Projecto
 {
     /// <summary>
+    /// Человек, который может быть назначен исполнителем задачи.
+    /// </summary>
+    public class User : IUser
+    {
+        public string Name { get; }
+
+        public User(string name)
+        {
+            Name = name;
+        }
+    }
+    
+    /// <summary>
     /// Общая для всех задач часть.
     /// </summary>
     public abstract class TaskBase : ITask
     {
-        public string Name { get; }
-        public DateTime CreatedAt { get; }
-        public TaskStatus TaskStatus { get; }
+        public string Name { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public TaskStatus TaskStatus { get; set; }
+
+        protected TaskBase(string name, TaskStatus taskStatus = default)
+        {
+            Name = name;
+            TaskStatus = taskStatus;
+            CreatedAt = DateTime.Now;
+        }
     }
 
     /// <summary>
@@ -37,6 +57,10 @@ namespace Projecto
             Executors.RemoveAt(index);
             return true;
         }
+
+        public Story(string name, TaskStatus taskStatus = default) : base(name, taskStatus)
+        {
+        }
     }
 
     // Все классы ниже тривиально реализуют все перечисленные для них интерфейсы.
@@ -48,6 +72,10 @@ namespace Projecto
     public class Epic : TaskBase, IHaveSubtasks<Epic>
     {
         public List<ISubtaskOf<Epic>> Subtasks { get; } = new List<ISubtaskOf<Epic>>();
+
+        public Epic(string name, TaskStatus taskStatus = default) : base(name, taskStatus)
+        {
+        }
     }
 
     /// <summary>
@@ -56,6 +84,10 @@ namespace Projecto
     public class Task : TaskBase, ISubtaskOf<Epic>, IHaveSingleExecutor
     {
         public IUser? Executor { get; set; }
+
+        public Task(string name, TaskStatus taskStatus = default) : base(name, taskStatus)
+        {
+        }
     }
 
     /// <summary>
@@ -64,18 +96,9 @@ namespace Projecto
     public class Bug : TaskBase, IHaveSingleExecutor
     {
         public IUser? Executor { get; set; }
-    }
 
-    /// <summary>
-    /// Человек, который может быть назначен исполнителем задачи.
-    /// </summary>
-    public class User : IUser
-    {
-        public string Name { get; }
-
-        public User(string name)
+        public Bug(string name, TaskStatus taskStatus = default) : base(name, taskStatus)
         {
-            Name = name;
         }
     }
 }

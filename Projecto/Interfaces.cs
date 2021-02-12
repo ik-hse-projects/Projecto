@@ -8,9 +8,9 @@ namespace Projecto
     /// </summary>
     public interface ITask
     {
-        public string Name { get; }
-        public DateTime CreatedAt { get; }
-        public TaskStatus TaskStatus { get; }
+        public string Name { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public TaskStatus TaskStatus { get; set; }
     }
 
     /// <summary>
