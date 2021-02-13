@@ -29,7 +29,7 @@ namespace Projecto.Tui
             new Program().mainLoop.Start();
         }
 
-        Program()
+        private Program()
         {
             mainLoop = new MainLoop(container);
             projects = new StackContainer().ListOf<Project>(project => new Button(project.Name)
@@ -63,30 +63,28 @@ namespace Projecto.Tui
             container.Add(tabs);
         }
 
-        private TabPage? OpenedProject;
+        private TabPage? CurrentProjectTab;
 
         private void OpenProject(Project? project)
         {
-            if (OpenedProject != null)
+            if (CurrentProjectTab != null)
             {
-                tabs.Remove(OpenedProject);
+                tabs.Remove(CurrentProjectTab);
             }
 
             if (project == null)
             {
-                OpenedProject = null;
+                CurrentProjectTab = null;
                 tabs.Focus(projectsTab);
             }
             else
             {
-                var opened = new OpenedProject(container, project);
-                opened.Deleted += () =>
-                {
-                    projects.Remove(project);
-                    OpenProject(null);
-                };
-                OpenedProject = tabs.Insert(3, $"[{project.Name}]", opened.Widget);
-                tabs.Focus(OpenedProject);
+                var opened = new Opened<Project>(container, project);
+                opened.Deleted += () => projects.Remove(project);
+                opened.Closed += () => OpenProject(null);
+                var widget = opened.Setup();
+                CurrentProjectTab = tabs.Insert(3, $"[{project.Name}]", widget);
+                tabs.Focus(CurrentProjectTab);
             }
         }
 

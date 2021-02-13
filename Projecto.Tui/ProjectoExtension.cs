@@ -16,5 +16,20 @@ namespace Projecto.Tui
                 TaskStatus.Completed => "Завершена",
             };
         }
+
+        /// <summary>
+        /// Определяет тип переданной задачи и переводит его на русский язык.
+        /// </summary>
+        public static string Kind(this ITask task)
+        {
+            return task switch
+            {
+                Epic _ => "Тема",
+                Story _ => "История",
+                Task _ => "Задача",
+                Bug _ => "Ошибка",
+                _ => "Другое"
+            };
+        }
     }
 }
