@@ -7,6 +7,8 @@ namespace Projecto.Tui
 {
     class Program
     {
+        public static readonly Program Instance = new Program();
+
         private const string HELP =
             "Добро пожаловать в Projecto!\n" +
             "Эта программа самая консольная среди проектоуправляющих и самая проектоуправляющая среди консольных\n" +
@@ -21,35 +23,33 @@ namespace Projecto.Tui
         private readonly Tabs tabs;
         private readonly TabPage<IWidget> projectsTab;
 
-        private readonly ListOf<Project> projects;
-        private readonly ListOf<User> users;
+        public readonly ListOf<Project> Projects;
+        public readonly ListOf<IUser> Users;
 
         static void Main()
         {
-            new Program().mainLoop.Start();
+            Instance.mainLoop.Start();
         }
 
         private Program()
         {
             mainLoop = new MainLoop(container);
-            projects = new StackContainer().ListOf<Project>(project => new Button(project.Name)
+            Projects = new StackContainer().ListOf<Project>(project => new Button(project.Name)
                 .OnClick(() => OpenProject(project)));
-            users = new StackContainer().ListOf<User>(user => new Button(user.Name)
-                .OnClick(() => users!.Remove(user)));
+            Users = new StackContainer().ListOf<IUser>(UserToWidget);
             tabs = new Tabs()
                 .Add("F1|Справка", new MultilineLabel(HELP, 78), out var helpTab)
                 .AndFocus()
                 .Add("F2|Пользователи", new StackContainer(margin: 1)
                     .Add(new Button("Добавить").OnClick(
                         () => AskForName("Добавление пользователя",
-                            name => users.Insert(0, new User(name)))))
-                    .Add(new Label(""))
-                    .Add(users.Widget), out var usersTab)
+                            name => Users.Insert(0, new User(name)))))
+                    .Add(Users.Widget), out var usersTab)
                 .Add("F3|Проекты", new StackContainer(margin: 1)
                     .Add(new Button("Создать").OnClick(
                         () => AskForName("Создание проекта",
-                            name => projects.Insert(0, new Project(name)))))
-                    .Add(projects.Widget), out projectsTab)
+                            name => Projects.Insert(0, new Project(name)))))
+                    .Add(Projects.Widget), out projectsTab)
                 .Add("F4|Меню", new StackContainer()
                     .Add(new Button("Сохранить как"))
                     .Add(new Button("Заугрузить откуда"))
@@ -61,6 +61,16 @@ namespace Projecto.Tui
                 .Add(new KeySelector(ConsoleKey.F3), () => tabs.Focus(projectsTab))
                 .Add(new KeySelector(ConsoleKey.F4), () => tabs.Focus(menuTab));
             container.Add(tabs);
+        }
+
+        private IWidget UserToWidget(IUser user)
+        {
+            var popup = new Popup();
+            var opened = new Opened<IUser>(popup.Container, user);
+            opened.Deleted.Value += () => Users.Remove(user);
+            opened.Closed.Value += () => popup.Close();
+            popup.Add(opened.Setup());
+            return new Button(user.Name).OnClick(() => popup.Show(container));
         }
 
         private TabPage? CurrentProjectTab;
@@ -80,8 +90,8 @@ namespace Projecto.Tui
             else
             {
                 var opened = new Opened<Project>(container, project);
-                opened.Deleted += () => projects.Remove(project);
-                opened.Closed += () => OpenProject(null);
+                opened.Deleted.Value += () => Projects.Remove(project);
+                opened.Closed.Value += () => OpenProject(null);
                 var widget = opened.Setup();
                 CurrentProjectTab = tabs.Insert(3, $"[{project.Name}]", widget);
                 tabs.Focus(CurrentProjectTab);
