@@ -16,7 +16,7 @@ namespace Projecto.Tui
             "Некоторые вещи, которые могут быть не совсем очевидны:\n" +
             "1. Переключаться между вкладками можно нажимая F1-F4 или стрелками влево-вправо, когда это возможно.\n" +
             "2. В Меню можно корректно выйти из программы.\n" +
-            "3. Это не приложение на WinForms, мышка здесь не пригодится.";
+            "3. Это не приложение на WinForms, мышку можно отложить в сторону.";
 
         private readonly MainLoop mainLoop;
         private readonly BaseContainer container = new BaseContainer();
@@ -65,12 +65,15 @@ namespace Projecto.Tui
 
         private IWidget UserToWidget(IUser user)
         {
-            var popup = new Popup();
-            var opened = new Opened<IUser>(popup.Container, user);
-            opened.Deleted.Value += () => Users.Remove(user);
-            opened.Closed.Value += () => popup.Close();
-            popup.Add(opened.Setup());
-            return new Button(user.Name).OnClick(() => popup.Show(container));
+            return new Button(user.Name).OnClick(() =>
+            {
+                var popup = new Popup();
+                var opened = new Opened<IUser>(popup.Container, user);
+                opened.Deleted.Value += () => Users.Remove(user);
+                opened.Closed.Value += () => popup.Close();
+                popup.Add(opened.Setup());
+                popup.Show(container);
+            });
         }
 
         private TabPage? CurrentProjectTab;

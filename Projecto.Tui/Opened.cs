@@ -121,7 +121,7 @@ namespace Projecto.Tui
             {
                 var opened = new Opened<ITask>(Opened.container, task);
                 var widget = opened.Setup();
-                var popup = new Popup(x: 2, y: 2).Add(widget);
+                var popup = new Popup().Add(widget);
                 opened.Closed.Value += () => popup.Close();
                 opened.Deleted.Value += () => Subtasks.Remove(task);
                 popup.Show(opened.root);
@@ -141,10 +141,19 @@ namespace Projecto.Tui
 
             private IWidget ExecutorToWidget(IUser executor)
             {
-                return new Expandable(new Label(executor.Name),
-                    new StackContainer(Orientation.Horizontal, 1)
-                        .Add(new Button(executor.Name))
-                        .Add(new Button("удалить").OnClick(() => Executors.Remove(executor))));
+                return new Button(executor.Name)
+                    .OnClick(() => AskForUser(Opened.container, user =>
+                    {
+                        if (user == null)
+                        {
+                            Executors.Remove(executor);
+                        }
+                        else
+                        {
+                            var idx = Executors.IndexOf(executor);
+                            Executors[idx] = user;
+                        }
+                    }));
             }
         }
 
@@ -179,7 +188,17 @@ namespace Projecto.Tui
         private static void SetupManyExecutors(this Opened<IHaveManyExecutors> opened)
         {
             var context = new ExecutorsContext(opened);
-            opened.content.Add(context.Executors.Widget);
+            opened.content
+                .Add(new Label(""))
+                .Add(new Label("Исполнители:"))
+                .Add(new Button("Добавить").OnClick(() => AskForUser(opened.container, user =>
+                {
+                    if (user != null)
+                    {
+                        context.Executors.Add(user);
+                    }
+                })))
+                .Add(context.Executors.Widget);
         }
 
         private static void SetupSingleExecutor(this Opened<IHaveSingleExecutor> opened)
