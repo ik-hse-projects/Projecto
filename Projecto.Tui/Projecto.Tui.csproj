@@ -11,4 +11,9 @@
       <ProjectReference Include="..\Thuja\Thuja.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="logo.br" />
+      <EmbeddedResource Include="logo.br" />
+    </ItemGroup>
+
 </Project>

@@ -1,6 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using Thuja;
+using Thuja.Video;
 using Thuja.Widgets;
 
 namespace Projecto.Tui
@@ -41,26 +46,46 @@ namespace Projecto.Tui
                 .Add("F1|Справка", new MultilineLabel(HELP, 78), out var helpTab)
                 .AndFocus()
                 .Add("F2|Пользователи", new StackContainer(margin: 1)
-                    .Add(new Button("Добавить").OnClick(
-                        () => AskForName("Добавление пользователя",
-                            name => Users.Insert(0, new User(name)))))
-                    .Add(Users.Widget), out var usersTab)
+                        .Add(new Button("Добавить").OnClick(
+                            () => AskForName("Добавление пользователя",
+                                name => Users.Insert(0, new User(name)))))
+                        .Add(Users.Widget),
+                    out var usersTab)
                 .Add("F3|Проекты", new StackContainer(margin: 1)
-                    .Add(new Button("Создать").OnClick(
-                        () => AskForName("Создание проекта",
-                            name => Projects.Insert(0, new Project(name)))))
-                    .Add(Projects.Widget), out projectsTab)
+                        .Add(new Button("Создать").OnClick(
+                            () => AskForName("Создание проекта",
+                                name => Projects.Insert(0, new Project(name)))))
+                        .Add(Projects.Widget),
+                    out projectsTab)
                 .Add("F4|Меню", new StackContainer()
-                    .Add(new Button("Сохранить как"))
-                    .Add(new Button("Заугрузить откуда"))
-                    .Add(new Button("Выйти").OnClick(
-                        () => mainLoop.OnStop = () => { })), out var menuTab);
+                        .Add(new Button("Выйти").OnClick(
+                            () => mainLoop.OnStop = () => { }))
+                        .Add(new Label(""))
+                        .Add(Logo()),
+                    out var menuTab);
             tabs.AsIKeyHandler()
                 .Add(new KeySelector(ConsoleKey.F1), () => tabs.Focus(helpTab))
                 .Add(new KeySelector(ConsoleKey.F2), () => tabs.Focus(usersTab))
                 .Add(new KeySelector(ConsoleKey.F3), () => tabs.Focus(projectsTab))
                 .Add(new KeySelector(ConsoleKey.F4), () => tabs.Focus(menuTab));
             container.Add(tabs);
+        }
+
+        private IWidget Logo()
+        {
+            try
+            {
+                var assembly = Assembly.GetExecutingAssembly();
+                var resourceName = assembly.GetManifestResourceNames()
+                    .Single(str => str.EndsWith("logo.br"));
+                var stream = assembly.GetManifestResourceStream(resourceName);
+                return new VideoPlayer(stream);
+            }
+            catch (Exception)
+            {
+                Debugger.Break();
+                return new BaseContainer();
+            }
         }
 
         private IWidget UserToWidget(IUser user)
