@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Text.Json.Serialization;
 
 namespace Projecto
 {
@@ -9,7 +10,7 @@ namespace Projecto
     /// </summary>
     public interface ITask
     {
-        public ITaskKind Kind { get; }
+        [JsonIgnore] public ITaskKind Kind { get; }
         public string Name { get; set; }
         public DateTime CreatedAt { get; set; }
         public TaskStatus TaskStatus { get; set; }
@@ -28,7 +29,7 @@ namespace Projecto
         /// <summary>
         /// Список допустимых подзадач.
         /// </summary>
-        public IReadOnlyList<ITaskKind> AllowedSubtasks { get; }
+        [JsonIgnore] public IReadOnlyList<ITaskKind> AllowedSubtasks { get; }
     }
 
     /// <summary>

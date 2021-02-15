@@ -1,7 +1,27 @@
+using System;
 using System.Collections.Generic;
 
 namespace Projecto
 {
+    /// <inheritdoc />
+    /// <summary>
+    /// Общая для всех задач часть.
+    /// </summary>
+    public abstract class TaskBase : ITask
+    {
+        public abstract ITaskKind Kind { get; }
+        public string Name { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public TaskStatus TaskStatus { get; set; }
+
+        protected TaskBase(string name, TaskStatus taskStatus = default)
+        {
+            Name = name;
+            TaskStatus = taskStatus;
+            CreatedAt = DateTime.Now;
+        }
+    }
+    
     /// <summary>
     /// Задача, по объему работ меньшая, чем Epic. Может быть подзадачей Epic.
     /// </summary>
@@ -47,13 +67,6 @@ namespace Projecto
         public override ITaskKind Kind => EpicFactory.Instance;
     }
 
-    public class EpicFactory : TaskFactoryBase<EpicFactory>
-    {
-        public override string Name => "Тема";
-
-        public override ITask Create(string name, TaskStatus taskStatus = default) => new Epic(name, taskStatus);
-    }
-
     /// <summary>
     /// Задача, по объему работ меньшая, чем Story. Может быть подзадачей Epic.
     /// </summary>
@@ -65,12 +78,6 @@ namespace Projecto
         public Task(string name, TaskStatus taskStatus = default) : base(name, taskStatus)
         {
         }
-    }
-
-    public class TaskFactory : TaskFactoryBase<TaskFactory>
-    {
-        public override string Name => "Задача";
-        public override ITask Create(string name, TaskStatus taskStatus = default) => new Task(name, taskStatus);
     }
 
     /// <summary>
@@ -85,11 +92,5 @@ namespace Projecto
         }
 
         public override ITaskKind Kind => BugFactory.Instance;
-    }
-
-    public class BugFactory : TaskFactoryBase<BugFactory>
-    {
-        public override string Name => "Ошибка";
-        public override ITask Create(string name, TaskStatus taskStatus = default) => new Bug(name, taskStatus);
     }
 }

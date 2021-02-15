@@ -28,6 +28,8 @@ namespace Projecto.Tui
         private readonly Tabs tabs;
         private readonly TabPage<IWidget> projectsTab;
 
+        public State State = new();
+
         public readonly ListOf<Project> Projects;
         public readonly ListOf<IUser> Users;
 
@@ -39,9 +41,9 @@ namespace Projecto.Tui
         private Program()
         {
             mainLoop = new MainLoop(container);
-            Projects = new StackContainer().ListOf<Project>(project => new Button(project.Name)
-                .OnClick(() => OpenProject(project)));
-            Users = new StackContainer().ListOf<IUser>(UserToWidget);
+            Projects = new StackContainer().FromList(State.Projects,
+                project => new Button(project.Name).OnClick(() => OpenProject(project)));
+            Users = new StackContainer().FromList(State.Users, UserToWidget);
             tabs = new Tabs()
                 .Add("F1|Справка", new MultilineLabel(HELP, 78), out var helpTab)
                 .AndFocus()
@@ -58,8 +60,15 @@ namespace Projecto.Tui
                         .Add(Projects.Widget),
                     out projectsTab)
                 .Add("F4|Меню", new StackContainer()
-                        .Add(new Button("Выйти").OnClick(
-                            () => mainLoop.OnStop = () => { }))
+                        .Add(new StackContainer(Orientation.Horizontal, 3)
+                            .Add(new Button("Выйти").OnClick(
+                                () => mainLoop.OnStop = () => { }))
+                            .Add(new Button("Serialize test")
+                                .OnClick(() =>
+                                {
+                                    var s = State.Serialize();
+                                    var de = State.Deserialize(s);
+                                })))
                         .Add(new Label(""))
                         .Add(Logo()),
                     out var menuTab);
