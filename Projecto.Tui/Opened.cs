@@ -291,7 +291,10 @@ namespace Projecto.Tui
         private static void SetupProject(this Opened<Project> opened)
         {
             opened.content
-                .Add(new Label($"Проект: {opened.Object.Name}"));
+                .Add(new StackContainer(Orientation.Horizontal, 1)
+                    .Add(new Label("Проект: "))
+                    .Add(new InputField(opened.Object.Name)
+                        .OnChanged(field => opened.Object.Name = field.Text.ToString())));
         }
 
         private static void SetupCloseDelete<T>(this Opened<T> opened)

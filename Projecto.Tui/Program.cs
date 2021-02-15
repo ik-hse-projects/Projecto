@@ -72,6 +72,16 @@ namespace Projecto.Tui
                         .Add(new Label(""))
                         .Add(Logo()),
                     out var menuTab);
+
+            // Когда меняется вкладка обновляем текущий проект, т.к. его имя могло измениться.
+            projectsTab.Focused += () =>
+            {
+                if (CurrentProject is var (_, project))
+                {
+                    Projects.Update(Projects.IndexOf(project));
+                }
+            };
+
             tabs.AsIKeyHandler()
                 .Add(new KeySelector(ConsoleKey.F1), () => tabs.Focus(helpTab))
                 .Add(new KeySelector(ConsoleKey.F2), () => tabs.Focus(usersTab))
@@ -114,28 +124,33 @@ namespace Projecto.Tui
             });
         }
 
-        private TabPage? CurrentProjectTab;
+        private (TabPage tab, Project project)? CurrentProject;
 
         private void OpenProject(Project? project)
         {
-            if (CurrentProjectTab != null)
+            if (CurrentProject != null)
             {
-                tabs.Remove(CurrentProjectTab);
+                tabs.Remove(CurrentProject.Value.tab);
             }
 
             if (project == null)
             {
-                CurrentProjectTab = null;
+                CurrentProject = null;
                 tabs.Focus(projectsTab);
             }
             else
             {
                 var opened = new Opened<Project>(container, project);
                 opened.Deleted.Value += () => Projects.Remove(project);
-                opened.Closed.Value += () => OpenProject(null);
+                opened.Closed.Value += () =>
+                {
+                    Projects.Update(Projects.IndexOf(project));
+                    OpenProject(null);
+                };
                 var widget = opened.Setup();
-                CurrentProjectTab = tabs.Insert(3, $"[{project.Name}]", widget);
-                tabs.Focus(CurrentProjectTab);
+                var tab = tabs.Insert(3, $"[{project.Name}]", widget);
+                CurrentProject = (tab, project);
+                tabs.Focus(tab);
             }
         }
 
