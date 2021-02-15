@@ -104,7 +104,11 @@ namespace Projecto.Tui
                 var popup = new Popup();
                 var opened = new Opened<IUser>(popup.Container, user);
                 opened.Deleted.Value += () => Users.Remove(user);
-                opened.Closed.Value += () => popup.Close();
+                opened.Closed.Value += () =>
+                {
+                    popup.Close();
+                    Users.Update(Users.IndexOf(user));
+                };
                 popup.Add(opened.Setup());
                 popup.Show(container);
             });

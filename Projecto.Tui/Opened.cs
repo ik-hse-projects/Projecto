@@ -178,10 +178,11 @@ namespace Projecto.Tui
 
         private static void SetupUser(this Opened<IUser> opened)
         {
-            new Popup()
+            opened.content
                 .Add(new StackContainer(Orientation.Horizontal)
                     .Add(new Label("Имя:"))
-                    .Add(new InputField(opened.Object.Name)))
+                    .Add(new InputField(opened.Object.Name)
+                        .OnChanged(field => opened.Object.Name = field.Text.ToString())))
                 .Add(new StackContainer());
         }
 

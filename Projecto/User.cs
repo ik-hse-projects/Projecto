@@ -5,7 +5,7 @@ namespace Projecto
     /// </summary>
     public class User : IUser
     {
-        public string Name { get; }
+        public string Name { get; set; }
 
         public User(string name)
         {
