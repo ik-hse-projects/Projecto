@@ -28,7 +28,6 @@ namespace Projecto.Tui
 
         internal Box<Action?> Closed { get; private init; } = new(null);
         internal Box<Action?> Deleted { get; private init; } = new(null);
-        internal Box<Action?> Modified { get; private init; } = new(null);
 
         public Opened(BaseContainer root, T obj) : this(obj)
         {
@@ -57,7 +56,6 @@ namespace Projecto.Tui
                 container = container,
                 Closed = Closed,
                 Deleted = Deleted,
-                Modified = Modified,
             };
         }
     }
@@ -122,7 +120,11 @@ namespace Projecto.Tui
                 var opened = new Opened<ITask>(Opened.container, task);
                 var widget = opened.Setup();
                 var popup = new Popup().Add(widget);
-                opened.Closed.Value += () => popup.Close();
+                opened.Closed.Value += () =>
+                {
+                    popup.Close();
+                    Subtasks.Update(Subtasks.IndexOf(task));
+                };
                 opened.Deleted.Value += () => Subtasks.Remove(task);
                 popup.Show(opened.root);
             }
@@ -131,7 +133,7 @@ namespace Projecto.Tui
         private class ExecutorsContext
         {
             public Opened<IHaveManyExecutors> Opened;
-            public ListOf<IUser> Executors;
+            public readonly ListOf<IUser> Executors;
 
             public ExecutorsContext(Opened<IHaveManyExecutors> opened)
             {
@@ -172,7 +174,6 @@ namespace Projecto.Tui
                 manyExecutors.SetupManyExecutors();
             if (opened.Cast<IHaveSubtasks>() is { } subtasks)
                 subtasks.SetupSubtasks();
-            opened.Modified.Value?.Invoke();
             return opened.container;
         }
 
@@ -204,13 +205,12 @@ namespace Projecto.Tui
 
         private static void SetupSingleExecutor(this Opened<IHaveSingleExecutor> opened)
         {
-            var button = new Button("...")
-                .OnClick(() => AskForUser(opened.container, u =>
+            var button = new Button(opened.Object.Executor?.Name ?? "<не назначен>")
+                .OnClick(btn => AskForUser(opened.container, u =>
                 {
                     opened.Object.Executor = u;
-                    opened.Modified.Value?.Invoke();
+                    btn.Text = opened.Object.Executor?.Name ?? "<не назначен>";
                 }));
-            opened.Modified.Value += () => button.Text = opened.Object.Executor?.Name ?? "<не назначен>";
             opened.content.Add(new StackContainer(Orientation.Horizontal, 1)
                 .Add(new Label("Исполнитель:"))
                 .Add(button));
@@ -246,13 +246,46 @@ namespace Projecto.Tui
                 .Add(context.Subtasks.Widget);
         }
 
-        private static void SetupTask<T>(this Opened<T> opened) where T : ITask
+        private static void SetupTask(this Opened<ITask> opened)
         {
             var task = opened.Object;
+
             opened.content
-                .Add(new Button($"{task.Kind.Name}: {task.Name}"))
-                .Add(new Button($"   Статус: {task.TaskStatus.RuString()}"))
-                .Add(new Button($"   Создана: {task.CreatedAt}"));
+                .Add(new StackContainer(Orientation.Horizontal, 1)
+                    .Add(new Label($"{task.Kind.Name}:"))
+                    .Add(new InputField(task.Name)
+                        .OnChanged(field => task.Name = field.Text.ToString())))
+                .Add(new StackContainer(Orientation.Horizontal, 1)
+                    .Add(new Label("Статус:"))
+                    .Add(new Button(task.TaskStatus.RuString())
+                        .OnClick(btn => opened.AskForStatus(task,
+                            status => btn.Text = status.RuString()))))
+                .Add(new StackContainer(Orientation.Horizontal, 1)
+                    .Add(new Label("Создана:"))
+                    .Add(new Label(task.CreatedAt.ToString())));
+        }
+
+        private static void AskForStatus(this Opened<ITask> opened, ITask task, Action<TaskStatus> callback)
+        {
+            var radios = new RadioSetBuilder<TaskStatus>()
+                .Add(TaskStatus.Open.RuString(), TaskStatus.Open)
+                .Add(TaskStatus.InProcess.RuString(), TaskStatus.InProcess)
+                .Add(TaskStatus.Completed.RuString(), TaskStatus.Completed);
+            radios.Check(task.TaskStatus);
+
+            var popup = new Popup();
+            radios.OnChecked += status =>
+            {
+                task.TaskStatus = status;
+                popup.Close();
+                callback(status);
+            };
+
+            popup
+                .Add(new Label("Выбрать статус:"))
+                .Add(radios.ToStack())
+                .AddClose("отмена")
+                .Show(opened.container);
         }
 
         private static void SetupProject(this Opened<Project> opened)
