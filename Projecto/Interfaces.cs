@@ -25,11 +25,12 @@ namespace Projecto
         /// Список подзадач. Можно менять.
         /// </summary>
         public List<ITask> Subtasks { get; }
-        
+
         /// <summary>
         /// Список допустимых подзадач.
         /// </summary>
-        [JsonIgnore] public IReadOnlyList<ITaskKind> AllowedSubtasks { get; }
+        [JsonIgnore]
+        public IReadOnlyList<ITaskKind> AllowedSubtasks { get; }
     }
 
     /// <summary>
@@ -197,5 +198,13 @@ namespace Projecto
         /// Завершенная задача.
         /// </summary>
         Completed,
+    }
+
+    /// <summary>
+    /// Методы для перечисления <see cref="TaskStatus"/>
+    /// </summary>
+    public static class TaskStatusExt
+    {
+        public static TaskStatus[] Statuses => new[] {TaskStatus.Open, TaskStatus.InProcess, TaskStatus.Completed};
     }
 }
