@@ -17,7 +17,7 @@ namespace Projecto.Tui
             public SubtasksContext(Opened<IHaveSubtasks> opened)
             {
                 Opened = opened;
-                Subtasks = new StackContainer().FromList(opened.Object.Subtasks, TaskToWidget);
+                Subtasks = new StackContainer(maxVisibleCount: 10).FromList(opened.Object.Subtasks, TaskToWidget);
             }
 
             public ImmutableHashSet<TaskStatus> Filter { get; set; } = TaskStatusExt.Statuses.ToImmutableHashSet();
@@ -58,11 +58,27 @@ namespace Projecto.Tui
                     return new BaseContainer();
                 }
 
+                var color = task.TaskStatus switch
+                {
+                    TaskStatus.Completed => MyColor.Green,
+                    TaskStatus.InProcess => MyColor.Yellow,
+                    TaskStatus.Open => MyColor.Cyan,
+                    _ => MyColor.Default,
+                };
+                var label = new Label(task.Name)
+                {
+                    CurrentStyle = new Style(color, MyColor.Default)
+                };
+
                 var title = task.Kind.Name;
                 return new Expandable(
-                    new Label($"{title}: {task.Name}"),
+                    new StackContainer(Orientation.Horizontal, 1)
+                        .Add(new Label(title))
+                        .Add(label),
                     new StackContainer()
-                        .Add(new Button($"{title}: {task.Name}").OnClick(() => OpenTask(task)))
+                        .Add(new StackContainer(Orientation.Horizontal, 1)
+                            .Add(new Button(title).OnClick(() => OpenTask(task)))
+                            .Add(label))
                         .Add(new Label($"   Статус: {task.TaskStatus.RuString()}"))
                         .Add(new Label($"   Создана: {task.CreatedAt}"))
                         .AsIKeyHandler()

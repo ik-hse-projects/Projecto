@@ -21,7 +21,9 @@ namespace Projecto.Tui
             "Некоторые вещи, которые могут быть не совсем очевидны:\n" +
             "1. Переключаться между вкладками можно нажимая F1-F4 или стрелками влево-вправо, когда это возможно.\n" +
             "2. В Меню можно корректно выйти из программы.\n" +
-            "3. Это не приложение на WinForms, мышку можно отложить в сторону.";
+            "3. Списки умеют прокручиваться. " +
+            "Если вы добавили 20 проектов и видите только часть, то надо просто пройтись по списку и всё будет.\n" +
+            "4. Это не приложение на WinForms, мышку можно отложить в сторону.";
 
         private readonly MainLoop mainLoop;
         private readonly BaseContainer container = new BaseContainer();
@@ -41,9 +43,9 @@ namespace Projecto.Tui
         private Program()
         {
             mainLoop = new MainLoop(container);
-            Projects = new StackContainer().FromList(State.Projects,
+            Projects = new StackContainer(maxVisibleCount: 15).FromList(State.Projects,
                 project => new Button(project.Name).OnClick(() => OpenProject(project)));
-            Users = new StackContainer().FromList(State.Users, UserToWidget);
+            Users = new StackContainer(maxVisibleCount: 15).FromList(State.Users, UserToWidget);
             tabs = new Tabs()
                 .Add("F1|Справка", new MultilineLabel(HELP, 78), out var helpTab)
                 .AndFocus()

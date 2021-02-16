@@ -14,7 +14,7 @@ namespace Projecto.Tui
             public ExecutorsContext(Opened<IHaveManyExecutors> opened)
             {
                 Opened = opened;
-                Executors = new StackContainer().FromList(opened.Object.Executors, ExecutorToWidget);
+                Executors = new StackContainer(maxVisibleCount: 10).FromList(opened.Object.Executors, ExecutorToWidget);
             }
 
             private IWidget ExecutorToWidget(IUser executor)
