@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -9,6 +10,9 @@ namespace Projecto.Tui
 {
     public static partial class OpenedExt
     {
+        /// <summary>
+        /// Добавляет список подзадач.
+        /// </summary>
         private static void SetupSubtasks(this Opened<IHaveSubtasks> opened)
         {
             var context = new SubtasksContext(opened);
@@ -18,18 +22,21 @@ namespace Projecto.Tui
                 .Add(new Button("Добавить задачу")
                     .OnClick(() => context.AddSubtask()))
                 .Add(new StackContainer(Orientation.Horizontal, 1)
-                    .Add(new Button("Фильтр:")
+                    .Add(new Button("Группировать и фильтровать:")
                         .OnClick(() => opened.AskForManyStatuses(context.Filter,
                             newFilter =>
                             {
                                 context.Filter = newFilter;
                                 filterLabel.Text = context.FilterString();
-                                context.Subtasks.Update();
+                                context.SortAndUpdate();
                             })))
                     .Add(filterLabel))
                 .Add(context.Subtasks.Widget);
         }
 
+        /// <summary>
+        /// Добавляет виджеты, соответсвующие любой задаче. Не проверяет, есть ли исполнители, подзадачи и всё такое.
+        /// </summary>
         private static void SetupTask(this Opened<ITask> opened)
         {
             var task = opened.Object;
@@ -53,6 +60,11 @@ namespace Projecto.Tui
                     .Add(new Label(task.CreatedAt.ToString())));
         }
 
+        /// <summary>
+        /// Запрашивает у пользователя статус задачи.
+        /// </summary>
+        /// <param name="defaultStatus">Статус, который будет отмечен как выбранный при открыти окна.</param>
+        /// <param name="callback">Функция, в которую передаётся выбранный статус, если пользователь его выбрал.</param>
         private static void AskForStatus<T>(this Opened<T> opened, TaskStatus defaultStatus,
             Action<TaskStatus> callback)
         {
@@ -78,6 +90,9 @@ namespace Projecto.Tui
                 .Show(opened.container);
         }
 
+        /// <summary>
+        /// Полностью аналогично <see cref="AskForStatus{T}"/>, но позволяет отмечать несколько статусов одновременно.
+        /// </summary>
         private static void AskForManyStatuses<T>(this Opened<T> opened, ImmutableHashSet<TaskStatus> defaultStatus,
             Action<ImmutableHashSet<TaskStatus>> callback)
         {
@@ -108,23 +123,48 @@ namespace Projecto.Tui
                 .Show(opened.container);
         }
 
+        /// <summary>
+        /// Вспомогательный класс, который хранит информацию о подзадачах.
+        /// </summary>
         private class SubtasksContext
         {
-            public readonly Opened<IHaveSubtasks> Opened;
+            private readonly Opened<IHaveSubtasks> opened;
+
+            /// <summary>
+            /// Список виджетов, соответсвующий списку подзадач из opened.Object.Subtasks.
+            /// </summary>
             public readonly ListOf<ITask> Subtasks;
 
             public SubtasksContext(Opened<IHaveSubtasks> opened)
             {
-                Opened = opened;
+                this.opened = opened;
                 Subtasks = new StackContainer(maxVisibleCount: 10).FromList(opened.Object.Subtasks, TaskToWidget);
             }
 
+            /// <summary>
+            /// Сортирует задачи по статусу и обновляет Subtasks.
+            /// </summary>
+            public void SortAndUpdate()
+            {
+                // https://stackoverflow.com/a/5037815
+                var list = Subtasks.GetInner();
+                var comparer = Comparer<ITask>.Create((l, r) => l.TaskStatus.CompareTo(r.TaskStatus));
+                ArrayList.Adapter((IList) list).Sort(comparer);
+                Subtasks.Update();
+            }
+
+            /// <summary>
+            /// Текущий фильтр подзадач.
+            /// </summary>
             public ImmutableHashSet<TaskStatus> Filter { get; set; } = TaskStatusExt.Statuses.ToImmutableHashSet();
 
+            /// <summary>
+            /// Добавляет новую подзадачу. Всю необходимую информацию запрашивает у пользователя, открывая попап.
+            /// </summary>
             internal void AddSubtask()
             {
                 var radios = new RadioSetBuilder<ITaskKind>();
-                foreach (var taskKind in Opened.Object.AllowedSubtasks)
+                foreach (var taskKind in opened.Object.AllowedSubtasks)
                 {
                     radios.Add(taskKind.Name, taskKind);
                 }
@@ -147,9 +187,12 @@ namespace Projecto.Tui
                         }
                     }))
                     .AddClose("Отмена")
-                    .Show(Opened.container);
+                    .Show(opened.container);
             }
 
+            /// <summary>
+            /// Преобразовывает задачу в красиывый виджет.
+            /// </summary>
             private IWidget TaskToWidget(ITask task)
             {
                 if (!Filter.Contains(task.TaskStatus))
@@ -184,20 +227,26 @@ namespace Projecto.Tui
                 );
             }
 
+            /// <summary>
+            /// Открывает подробную информацию о задаче.
+            /// </summary>
             private void OpenTask(ITask task)
             {
-                var opened = new Opened<ITask>(Opened.container, task);
-                var widget = opened.Setup();
+                var newOpened = new Opened<ITask>(task);
+                var widget = newOpened.Setup();
                 var popup = new Popup().Add(widget);
-                opened.Closed.Value += () =>
+                newOpened.Closed.Value += () =>
                 {
                     popup.Close();
                     Subtasks.Update(Subtasks.IndexOf(task));
                 };
-                opened.Deleted.Value += () => Subtasks.Remove(task);
-                popup.Show(opened.root);
+                newOpened.Deleted.Value += () => Subtasks.Remove(task);
+                popup.Show(opened.container);
             }
 
+            /// <summary>
+            /// Преобразовывает текущий фильтр подзадач в читабельную строку.
+            /// </summary>
             public string FilterString()
             {
                 return string.Join(", ", Filter.Select(x => x.RuString()));

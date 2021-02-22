@@ -6,6 +6,9 @@ namespace Projecto.Tui
     /// </summary>
     internal class Box<T>
     {
+        /// <summary>
+        /// Обёрнутое значение.
+        /// </summary>
         public T Value;
 
         public Box(T value)

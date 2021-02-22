@@ -27,6 +27,16 @@ namespace Projecto
     public static class TaskStatusExt
     {
         public static TaskStatus[] Statuses => new[] {TaskStatus.Open, TaskStatus.InProcess, TaskStatus.Completed};
+        
+        public static string RuString(this TaskStatus status)
+        {
+            return status switch
+            {
+                TaskStatus.Open => "Открыта",
+                TaskStatus.InProcess => "В работе",
+                TaskStatus.Completed => "Завершена"
+            };
+        }
     }
 
     // Я оставил эти два типа в одном файле, поскольку разделять их было бы очень странно и неприятно.

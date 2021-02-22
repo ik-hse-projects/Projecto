@@ -8,20 +8,14 @@ namespace Projecto.Tui
     {
         internal readonly T Object;
 
-        public Opened(BaseContainer root, T obj) : this(obj)
+        public Opened(T obj)
         {
-            this.root = root;
+            Object = obj;
             content = new StackContainer();
             container = new BaseContainer().Add(content);
             Deleted.Value += () => Closed.Value?.Invoke();
         }
 
-        private Opened(T obj)
-        {
-            Object = obj;
-        }
-
-        internal BaseContainer root { get; private init; }
         internal BaseContainer container { get; private init; }
         internal StackContainer content { get; private init; }
 
@@ -37,7 +31,6 @@ namespace Projecto.Tui
 
             return new Opened<T2>(casted)
             {
-                root = root,
                 content = content,
                 container = container,
                 Closed = Closed,

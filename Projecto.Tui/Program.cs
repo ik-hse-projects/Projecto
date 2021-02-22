@@ -11,7 +11,10 @@ namespace Projecto.Tui
 {
     internal class Program
     {
-        private const string HELP =
+        /// <summary>
+        /// Справка по программе, отображается на первом экране.
+        /// </summary>
+        private const string Help =
             "Добро пожаловать в Projecto!\n" +
             "Эта программа самая консольная среди проектоуправляющих и самая проектоуправляющая среди консольных\n" +
             "\n" +
@@ -24,29 +27,43 @@ namespace Projecto.Tui
             "он будет переименован везде: и в списке пользователей, и во всех проектах.\n" +
             "5. Это не приложение на WinForms, мышку можно отложить в сторону.";
 
+        /// <summary>
+        /// Путь к файлу, в котором сохраняется состояние.
+        /// </summary>
         private const string STATE_JSON = "state.json";
+        
+        /// <summary>
+        /// Класс Program — Singleton. И вот его единственный экземпляр:
+        /// </summary>
         public static readonly Program Instance = new();
+        
+        /// <summary>
+        /// Контейнер, в котором происходит вся отрисовка.
+        /// </summary>
         private readonly BaseContainer container = new();
 
         private readonly MainLoop mainLoop;
 
+        /// <summary>
+        /// Список проектов в интерфейсе.
+        /// </summary>
         public readonly ListOf<Project> Projects;
         private readonly TabPage<IWidget> projectsTab;
-
-        private readonly State State = LoadState();
+        
+        private readonly State state = LoadState();
         private readonly Tabs tabs;
         public readonly ListOf<User> Users;
 
-        private (TabPage tab, Project project)? CurrentProject;
+        private (TabPage tab, Project project)? currentProject;
 
         private Program()
         {
             mainLoop = new MainLoop(container);
-            Projects = new StackContainer(maxVisibleCount: 15).FromList(State.Projects,
+            Projects = new StackContainer(maxVisibleCount: 15).FromList(state.Projects,
                 project => new Button(project.Name).OnClick(() => OpenProject(project)));
-            Users = new StackContainer(maxVisibleCount: 15).FromList(State.Users, UserToWidget);
+            Users = new StackContainer(maxVisibleCount: 15).FromList(state.Users, UserToWidget);
             tabs = new Tabs()
-                .Add("F1|Справка", new MultilineLabel(HELP, 78), out var helpTab)
+                .Add("F1|Справка", new MultilineLabel(Help, 78), out var helpTab)
                 .AndFocus()
                 .Add("F2|Пользователи", new StackContainer(margin: 1)
                         .Add(new Button("Добавить").OnClick(
@@ -70,7 +87,7 @@ namespace Projecto.Tui
             // Когда меняется вкладка обновляем текущий проект, т.к. его имя могло измениться.
             projectsTab.Focused += () =>
             {
-                if (CurrentProject is var (_, project))
+                if (currentProject is var (_, project))
                 {
                     Projects.Update(Projects.IndexOf(project));
                 }
@@ -84,16 +101,22 @@ namespace Projecto.Tui
             container.Add(tabs);
         }
 
+        /// <summary>
+        /// Точка входа, которая запускает mainLoop.
+        /// </summary>
         private static void Main()
         {
             Instance.mainLoop.Start();
         }
 
+        /// <summary>
+        /// Сохраняет состояние в файл.
+        /// </summary>
         private void SaveState()
         {
             try
             {
-                var state = State.Serialize();
+                var state = this.state.Serialize();
                 File.WriteAllText(STATE_JSON, state);
             }
             catch (Exception e)
@@ -105,6 +128,9 @@ namespace Projecto.Tui
             }
         }
 
+        /// <summary>
+        /// Загружает состояние из файла.
+        /// </summary>
         private static State LoadState()
         {
             try
@@ -123,6 +149,9 @@ namespace Projecto.Tui
             }
         }
 
+        /// <summary>
+        /// Загружает логотип из embedded resources.
+        /// </summary>
         private static IWidget Logo()
         {
             try
@@ -140,12 +169,15 @@ namespace Projecto.Tui
             }
         }
 
+        /// <summary>
+        /// Преобразовывает пользователя в виджет для списка.
+        /// </summary>
         private IWidget UserToWidget(User user)
         {
             return new Button(user.Name).OnClick(() =>
             {
                 var popup = new Popup();
-                var opened = new Opened<User>(popup.Container, user);
+                var opened = new Opened<User>(user);
                 opened.Deleted.Value += () => Users.Remove(user);
                 opened.Closed.Value += () =>
                 {
@@ -157,21 +189,24 @@ namespace Projecto.Tui
             });
         }
 
+        /// <summary>
+        /// Открывает проект, закрывая предыдущий при необходимости.
+        /// </summary>
         private void OpenProject(Project? project)
         {
-            if (CurrentProject != null)
+            if (currentProject != null)
             {
-                tabs.Remove(CurrentProject.Value.tab);
+                tabs.Remove(currentProject.Value.tab);
             }
 
             if (project == null)
             {
-                CurrentProject = null;
+                currentProject = null;
                 tabs.Focus(projectsTab);
             }
             else
             {
-                var opened = new Opened<Project>(container, project);
+                var opened = new Opened<Project>(project);
                 opened.Deleted.Value += () => Projects.Remove(project);
                 opened.Closed.Value += () =>
                 {
@@ -180,11 +215,16 @@ namespace Projecto.Tui
                 };
                 var widget = opened.Setup();
                 var tab = tabs.Insert(3, $"[{project.Name}]", widget);
-                CurrentProject = (tab, project);
+                currentProject = (tab, project);
                 tabs.Focus(tab);
             }
         }
 
+        /// <summary>
+        /// Спршивает у пользователя имя чего-либо.
+        /// </summary>
+        /// <param name="title">Вопрос к пользователю, чтобы он понимал, чьё имя нужно вводить.</param>
+        /// <param name="callback">Функция вызовется, когда пользователб всё введёт и нажмет кнопку.</param>
         private void AskForName(string title, Action<string> callback)
         {
             var name = new InputField();

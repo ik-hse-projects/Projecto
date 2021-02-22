@@ -5,6 +5,12 @@ namespace Projecto.Tui
 {
     public static partial class OpenedExt
     {
+        /// <summary>
+        /// Перебирет все известные интерфейсы и добавляет необходимые виджеты, если T их реализует (интерфейсы).
+        /// </summary>
+        /// <returns>Виджет, который содержит все добавленные виджеты.</returns>
+        // Здесь вместо T мог бы быть просто `Opened<object>`, но это бы потребовало дополнительного
+        // вызова Cast, что не очень краисво, приятно и удобно. См. описание Opened.Cast, почему так приходится делать.
         public static IWidget Setup<T>(this Opened<T> opened)
         {
             if (opened.Cast<ITask>() is { } task)
@@ -41,6 +47,9 @@ namespace Projecto.Tui
             return opened.container;
         }
 
+        /// <summary>
+        /// Добавляет виджеты, соответсвующие пользователю.
+        /// </summary>
         private static void SetupUser(this Opened<User> opened)
         {
             opened.content
@@ -51,6 +60,9 @@ namespace Projecto.Tui
                 .Add(new StackContainer());
         }
 
+        /// <summary>
+        /// Добавляет виджеты, соответсвующие проекту.
+        /// </summary>
         private static void SetupProject(this Opened<Project> opened)
         {
             opened.content
@@ -60,6 +72,9 @@ namespace Projecto.Tui
                         .OnChanged(field => opened.Object.Name = field.Text.ToString())));
         }
 
+        /// <summary>
+        /// Добавляет кнопки закрытия и удаления. 
+        /// </summary>
         private static void SetupCloseDelete<T>(this Opened<T> opened)
         {
             opened.content
