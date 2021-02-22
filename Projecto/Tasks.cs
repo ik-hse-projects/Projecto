@@ -57,14 +57,14 @@ namespace Projecto
         public IReadOnlyList<ITaskKind> AllowedSubtasks => new ITaskKind[]
         {
             StoryFactory.Instance,
-            TaskFactory.Instance,
+            TaskCreator.Instance,
         };
 
         public Epic(string name, TaskStatus taskStatus = default) : base(name, taskStatus)
         {
         }
 
-        public override ITaskKind Kind => EpicFactory.Instance;
+        public override ITaskKind Kind => EpicCreator.Instance;
     }
 
     /// <summary>
@@ -73,7 +73,7 @@ namespace Projecto
     public class Task : TaskBase, IHaveSingleExecutor
     {
         public IUser? Executor { get; set; }
-        public override ITaskKind Kind => TaskFactory.Instance;
+        public override ITaskKind Kind => TaskCreator.Instance;
 
         public Task(string name, TaskStatus taskStatus = default) : base(name, taskStatus)
         {
@@ -91,6 +91,6 @@ namespace Projecto
         {
         }
 
-        public override ITaskKind Kind => BugFactory.Instance;
+        public override ITaskKind Kind => BugCreator.Instance;
     }
 }

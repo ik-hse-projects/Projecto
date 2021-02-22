@@ -8,7 +8,8 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Projecto\Projecto.csproj" />
-      <ProjectReference Include="..\Thuja\Thuja.csproj" />
+      <ProjectReference Include="..\Thuja\Thuja.Core\Thuja.csproj" />
+      <ProjectReference Include="..\Thuja\Thuja.Winforms\Thuja.Winforms.csproj" />
     </ItemGroup>
 
     <ItemGroup>

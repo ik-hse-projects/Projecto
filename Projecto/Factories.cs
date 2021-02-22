@@ -2,7 +2,11 @@ using System.Text.Json.Serialization;
 
 namespace Projecto
 {
-    public abstract class TaskFactoryBase<TSelf> : ITaskKind where TSelf : new()
+    /// <summary>
+    /// Общая часть для всех фабрик, которые создают различные ITask. 
+    /// </summary>
+    /// <typeparam name="TSelf"></typeparam>
+    public abstract class TaskCreatorBase<TSelf> : ITaskKind where TSelf : new()
     {
         public static TSelf Instance = new();
 
@@ -10,20 +14,20 @@ namespace Projecto
         public abstract ITask Create(string name, TaskStatus taskStatus = default);
     }
 
-    public class EpicFactory : TaskFactoryBase<EpicFactory>
+    public class EpicCreator : TaskCreatorBase<EpicCreator>
     {
         public override string Name => "Тема";
 
         public override ITask Create(string name, TaskStatus taskStatus = default) => new Epic(name, taskStatus);
     }
 
-    public class TaskFactory : TaskFactoryBase<TaskFactory>
+    public class TaskCreator : TaskCreatorBase<TaskCreator>
     {
         public override string Name => "Задача";
         public override ITask Create(string name, TaskStatus taskStatus = default) => new Task(name, taskStatus);
     }
 
-    public class BugFactory : TaskFactoryBase<BugFactory>
+    public class BugCreator : TaskCreatorBase<BugCreator>
     {
         public override string Name => "Ошибка";
         public override ITask Create(string name, TaskStatus taskStatus = default) => new Bug(name, taskStatus);

@@ -10,8 +10,8 @@ namespace Projecto
 
         public IReadOnlyList<ITaskKind> AllowedSubtasks => new ITaskKind[]
         {
-            EpicFactory.Instance,
-            BugFactory.Instance
+            EpicCreator.Instance,
+            BugCreator.Instance
         };
 
         public Project(string name)
