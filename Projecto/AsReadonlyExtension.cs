@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Projecto
 {
     // https://stackoverflow.com/a/34362585
-    public static class ReadOnlyListExtensions
+    public static class AsReadonlyExtension
     {
         public static IReadOnlyList<T> AsReadOnly<T>(this IList<T> source)
         {
