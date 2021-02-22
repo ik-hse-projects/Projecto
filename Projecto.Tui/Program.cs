@@ -7,7 +7,6 @@ using System.Reflection;
 using Thuja;
 using Thuja.Video;
 using Thuja.Widgets;
-using Thuja.Winforms;
 
 namespace Projecto.Tui
 {
