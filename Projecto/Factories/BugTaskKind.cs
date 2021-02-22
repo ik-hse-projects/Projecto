@@ -1,10 +1,15 @@
 namespace Projecto
 {
-    public class BugTaskKind : TaskKindBase<BugTaskKind>
+    /// <summary>
+    /// <see cref="ITaskKind" /> для <see cref="Task" />.
+    /// </summary>
+    public class BugTaskKind : Singleton<BugTaskKind>, ITaskKind
     {
-        public override string Name => "Ошибка";
+        /// <inheritdoc />
+        public string Name => "Ошибка";
 
-        public override ITask Create(string name, TaskStatus taskStatus = default)
+        /// <inheritdoc />
+        public ITask Create(string name, TaskStatus taskStatus = default)
         {
             return new Bug(name, taskStatus);
         }

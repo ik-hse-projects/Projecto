@@ -17,7 +17,7 @@ namespace Projecto.Tui
                 project.SetupProject();
             }
 
-            if (opened.Cast<IUser>() is { } user)
+            if (opened.Cast<User>() is { } user)
             {
                 user.SetupUser();
             }
@@ -41,7 +41,7 @@ namespace Projecto.Tui
             return opened.container;
         }
 
-        private static void SetupUser(this Opened<IUser> opened)
+        private static void SetupUser(this Opened<User> opened)
         {
             opened.content
                 .Add(new StackContainer(Orientation.Horizontal)

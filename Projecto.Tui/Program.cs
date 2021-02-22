@@ -35,7 +35,7 @@ namespace Projecto.Tui
 
         private readonly State State = LoadState();
         private readonly Tabs tabs;
-        public readonly ListOf<IUser> Users;
+        public readonly ListOf<User> Users;
 
         private (TabPage tab, Project project)? CurrentProject;
 
@@ -140,12 +140,12 @@ namespace Projecto.Tui
             }
         }
 
-        private IWidget UserToWidget(IUser user)
+        private IWidget UserToWidget(User user)
         {
             return new Button(user.Name).OnClick(() =>
             {
                 var popup = new Popup();
-                var opened = new Opened<IUser>(popup.Container, user);
+                var opened = new Opened<User>(popup.Container, user);
                 opened.Deleted.Value += () => Users.Remove(user);
                 opened.Closed.Value += () =>
                 {

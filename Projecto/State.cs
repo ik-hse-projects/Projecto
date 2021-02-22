@@ -13,21 +13,38 @@ namespace Projecto
     /// </summary>
     public class State
     {
+        /// <summary>
+        /// Правильные настройки сериализации.
+        /// </summary>
         private static readonly JsonSerializerSettings Settings = new()
         {
-            ContractResolver = new WritablePropertiesOnlyResolver(),
+            // см. класс GoodPropertiesResolver, он в конце файла.
+            ContractResolver = new GoodPropertiesResolver(),
             PreserveReferencesHandling = PreserveReferencesHandling.All,
             TypeNameHandling = TypeNameHandling.Auto
         };
 
-        public List<IUser> Users { get; } = new();
+        /// <summary>
+        /// Список пользователей.
+        /// </summary>
+        public List<User> Users { get; } = new();
+        
+        /// <summary>
+        /// Список проектов.
+        /// </summary>
         public List<Project> Projects { get; } = new();
 
+        /// <summary>
+        /// Превращает <see cref="State"/> в строку (json). Может выкидывать исключения.
+        /// </summary>
         public string Serialize()
         {
             return JsonConvert.SerializeObject(this, Formatting.Indented, Settings);
         }
 
+        /// <summary>
+        /// Загружает <see cref="State"/> из строки (json). Может выкидывать исключения.
+        /// </summary>
         public static State Deserialize(string data)
         {
             return JsonConvert.DeserializeObject<State>(data, Settings) ?? throw new InvalidDataException();
@@ -39,8 +56,9 @@ namespace Projecto
         /// Этот класс позволяет это делать!
         /// </summary>
         // Основано на: https://stackoverflow.com/a/18548894 и https://stackoverflow.com/a/16506710
-        private class WritablePropertiesOnlyResolver : DefaultContractResolver
+        private class GoodPropertiesResolver : DefaultContractResolver
         {
+            /// <inheritdoc />
             protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization)
             {
                 var fields = type.GetFields(BindingFlags.NonPublic | BindingFlags.Instance);

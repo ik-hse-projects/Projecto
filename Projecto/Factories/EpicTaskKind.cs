@@ -1,10 +1,15 @@
 namespace Projecto
 {
-    public class EpicTaskKind : TaskKindBase<EpicTaskKind>
+    /// <summary>
+    /// <see cref="ITaskKind"/> для <see cref="Epic"/>.
+    /// </summary>
+    public class EpicTaskKind : Singleton<EpicTaskKind>, ITaskKind
     {
-        public override string Name => "Тема";
+        /// <inheritdoc />
+        public string Name => "Тема";
 
-        public override ITask Create(string name, TaskStatus taskStatus = default)
+        /// <inheritdoc />
+        public ITask Create(string name, TaskStatus taskStatus = default)
         {
             return new Epic(name, taskStatus);
         }

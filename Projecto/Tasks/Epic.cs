@@ -11,9 +11,13 @@ namespace Projecto
         {
         }
 
+        /// <inheritdoc />
         public override ITaskKind Kind => EpicTaskKind.Instance;
+
+        /// <inheritdoc />
         public List<ITask> Subtasks { get; } = new();
 
+        /// <inheritdoc />
         public IReadOnlyList<ITaskKind> AllowedSubtasks => new ITaskKind[]
         {
             StoryTaskKind.Instance,

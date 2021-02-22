@@ -8,21 +8,26 @@ namespace Projecto
     /// </summary>
     public interface IHaveExecutors
     {
+        // Я не очень люблю, когда методы выкидывают исключения. Но иногда это удобно.
+        // Поэтому этот интерфейс требует реализовать TryAddExecutor и TryRemoveExecutorAt,
+        // которые возвращают приятный false вместо исключения.
+        // А выбрасывающие исключения методы имеют реализацию по-умолчанию на основе невыбрасывающих.
+        
         /// <summary>
         /// Список исполнителей. Только читать.
         /// </summary>
-        public IReadOnlyList<IUser> Executors { get; }
+        public IReadOnlyList<User> Executors { get; }
 
         /// <summary>
         /// Добавляет исполнителя. Если это почему-то невозможно, то возвращает false.
         /// Например, эта задача разрешает только одного исполнителя.
         /// </summary>
-        public bool TryAddExecutor(IUser user);
+        public bool TryAddExecutor(User user);
 
         /// <summary>
         /// Добавляет исполнителя и выбрасывает исключение, если почему-то это невозможно.
         /// </summary>
-        public void AddExecutor(IUser user)
+        public void AddExecutor(User user)
         {
             if (!TryAddExecutor(user))
             {

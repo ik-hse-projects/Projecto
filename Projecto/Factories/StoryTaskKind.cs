@@ -1,10 +1,15 @@
 namespace Projecto
 {
-    public class StoryTaskKind : TaskKindBase<StoryTaskKind>
+    /// <summary>
+    /// <see cref="ITaskKind"/> для <see cref="Story"/>.
+    /// </summary>
+    public class StoryTaskKind : Singleton<StoryTaskKind>, ITaskKind
     {
-        public override string Name => "История";
+        /// <inheritdoc />
+        public string Name => "История";
 
-        public override ITask Create(string name, TaskStatus taskStatus = default)
+        /// <inheritdoc />
+        public ITask Create(string name, TaskStatus taskStatus = default)
         {
             return new Story(name, taskStatus);
         }

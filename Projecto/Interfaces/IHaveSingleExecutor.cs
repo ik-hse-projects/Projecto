@@ -15,13 +15,15 @@ namespace Projecto
         /// <summary>
         /// Единственный исполнитель. null, если он не назначен. Можно менять.
         /// </summary>
-        public IUser? Executor { get; set; }
+        public User? Executor { get; set; }
 
-        // Далее следует реализация IHaveManyExecutors.
+        // Далее следует реализация по-умолчанию IHaveManyExecutors.
 
-        IReadOnlyList<IUser> IHaveExecutors.Executors => Executor == null ? Array.Empty<IUser>() : new[] {Executor};
+        /// <inheritdoc />
+        IReadOnlyList<User> IHaveExecutors.Executors => Executor == null ? Array.Empty<User>() : new[] {Executor};
 
-        bool IHaveExecutors.TryAddExecutor(IUser user)
+        /// <inheritdoc />
+        bool IHaveExecutors.TryAddExecutor(User user)
         {
             if (Executor == null)
             {
@@ -32,6 +34,7 @@ namespace Projecto
             return true;
         }
 
+        /// <inheritdoc />
         bool IHaveExecutors.TryRemoveExecutorAt(int index)
         {
             if (index != 0 || Executor == null)

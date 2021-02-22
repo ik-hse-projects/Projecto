@@ -20,7 +20,7 @@ namespace Projecto
         /// </summary>
         Completed
     }
-    
+
     /// <summary>
     /// Методы для перечисления <see cref="TaskStatus" />
     /// </summary>
@@ -28,4 +28,7 @@ namespace Projecto
     {
         public static TaskStatus[] Statuses => new[] {TaskStatus.Open, TaskStatus.InProcess, TaskStatus.Completed};
     }
+
+    // Я оставил эти два типа в одном файле, поскольку разделять их было бы очень странно и неприятно.
+    // Как жаль, что C# не позволяет добавлять методы к enum'ам.
 }

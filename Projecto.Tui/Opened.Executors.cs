@@ -37,7 +37,7 @@ namespace Projecto.Tui
 
         private class ExecutorsContext
         {
-            public readonly ListOf<IUser> Executors;
+            public readonly ListOf<User> Executors;
             public readonly Opened<IHaveManyExecutors> Opened;
 
             public ExecutorsContext(Opened<IHaveManyExecutors> opened)
@@ -46,7 +46,7 @@ namespace Projecto.Tui
                 Executors = new StackContainer(maxVisibleCount: 10).FromList(opened.Object.Executors, ExecutorToWidget);
             }
 
-            private IWidget ExecutorToWidget(IUser executor)
+            private IWidget ExecutorToWidget(User executor)
             {
                 return new Button(executor.Name)
                     .OnClick(() => AskForUser(Opened.container, user =>
@@ -63,7 +63,7 @@ namespace Projecto.Tui
                     }));
             }
 
-            public static void AskForUser(BaseContainer root, Action<IUser?> callback)
+            public static void AskForUser(BaseContainer root, Action<User?> callback)
             {
                 new Popup()
                     .AddWith(popup => new Button("никто").OnClick(() =>
@@ -72,7 +72,7 @@ namespace Projecto.Tui
                         popup.Close();
                     }))
                     .Add(new Label(""))
-                    .AddWith(popup => new FuzzySearch<IUser>(Program.Instance.Users, u => u.Name)
+                    .AddWith(popup => new FuzzySearch<User>(Program.Instance.Users, u => u.Name)
                         .OnChosen(search =>
                         {
                             callback(search.Choice);

@@ -9,7 +9,10 @@ namespace Projecto
         {
         }
 
+        /// <inheritdoc />
         public override ITaskKind Kind => BugTaskKind.Instance;
-        public IUser? Executor { get; set; }
+
+        /// <inheritdoc />
+        public User? Executor { get; set; }
     }
 }

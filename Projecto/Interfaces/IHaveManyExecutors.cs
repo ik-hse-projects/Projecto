@@ -8,15 +8,18 @@ namespace Projecto
     public interface IHaveManyExecutors : IHaveExecutors
     {
         /// <summary>
-        /// Список исполнителей. Можно менять
+        /// Список исполнителей. Можно менять.
         /// </summary>
-        public new IList<IUser> Executors { get; }
+        // Основное отличие от IHaveExecutors.Executors — то, что это уже не IReadOnlyList, а полноценный IList.
+        public new IList<User> Executors { get; }
+
+        // Далее следует реализация по-умолчанию IHaveManyExecutors.
+        
+        /// <inheritdoc />
+        IReadOnlyList<User> IHaveExecutors.Executors => Executors.AsReadOnly();
 
         /// <inheritdoc />
-        IReadOnlyList<IUser> IHaveExecutors.Executors => Executors.AsReadOnly();
-
-        /// <inheritdoc />
-        bool IHaveExecutors.TryAddExecutor(IUser user)
+        bool IHaveExecutors.TryAddExecutor(User user)
         {
             Executors.Add(user);
             return true;

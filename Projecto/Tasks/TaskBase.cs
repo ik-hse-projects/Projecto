@@ -15,9 +15,16 @@ namespace Projecto
             CreatedAt = DateTime.Now;
         }
 
+        /// <inheritdoc />
         public abstract ITaskKind Kind { get; }
+
+        /// <inheritdoc />
         public string Name { get; set; }
+
+        /// <inheritdoc />
         public DateTime CreatedAt { get; set; }
+
+        /// <inheritdoc />
         public TaskStatus TaskStatus { get; set; }
     }
 }

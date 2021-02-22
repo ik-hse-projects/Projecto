@@ -10,6 +10,6 @@ namespace Projecto
         }
 
         public override ITaskKind Kind => TaskTaskKind.Instance;
-        public IUser? Executor { get; set; }
+        public User? Executor { get; set; }
     }
 }

@@ -11,7 +11,10 @@ namespace Projecto
         {
         }
 
+        /// <inheritdoc />
         public override ITaskKind Kind => StoryTaskKind.Instance;
-        IList<IUser> IHaveManyExecutors.Executors { get; } = new List<IUser>();
+
+        /// <inheritdoc />
+        IList<User> IHaveManyExecutors.Executors { get; } = new List<User>();
     }
 }
