@@ -1,5 +1,3 @@
-using Newtonsoft.Json;
-
 namespace Projecto
 {
     /// <summary>
@@ -7,11 +5,11 @@ namespace Projecto
     /// </summary>
     public class User : IUser
     {
-        public string Name { get; set; }
-
         public User(string name)
         {
             Name = name;
         }
+
+        public string Name { get; set; }
     }
 }

@@ -9,17 +9,34 @@ namespace Projecto
     {
         public static IReadOnlyList<T> AsReadOnly<T>(this IList<T> source)
         {
-            if (source == null) throw new ArgumentNullException(nameof(source));
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
             return source as IReadOnlyList<T> ?? new ReadOnlyListAdapter<T>(source);
         }
 
-        sealed class ReadOnlyListAdapter<T> : IReadOnlyList<T>
+        private sealed class ReadOnlyListAdapter<T> : IReadOnlyList<T>
         {
-            readonly IList<T> source;
-            public ReadOnlyListAdapter(IList<T> source) => this.source = source;
+            private readonly IList<T> source;
+
+            public ReadOnlyListAdapter(IList<T> source)
+            {
+                this.source = source;
+            }
+
             public int Count => source.Count;
-            public IEnumerator<T> GetEnumerator() => source.GetEnumerator();
-            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+            public IEnumerator<T> GetEnumerator()
+            {
+                return source.GetEnumerator();
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
 
             public T this[int index] => source[index];
         }

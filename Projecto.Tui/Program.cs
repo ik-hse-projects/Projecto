@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -10,10 +9,8 @@ using Thuja.Widgets;
 
 namespace Projecto.Tui
 {
-    class Program
+    internal class Program
     {
-        public static readonly Program Instance = new Program();
-
         private const string HELP =
             "Добро пожаловать в Projecto!\n" +
             "Эта программа самая консольная среди проектоуправляющих и самая проектоуправляющая среди консольных\n" +
@@ -27,20 +24,20 @@ namespace Projecto.Tui
             "он будет переименован везде: и в списке пользователей, и во всех проектах.\n" +
             "5. Это не приложение на WinForms, мышку можно отложить в сторону.";
 
+        private const string STATE_JSON = "state.json";
+        public static readonly Program Instance = new();
+        private readonly BaseContainer container = new();
+
         private readonly MainLoop mainLoop;
-        private readonly BaseContainer container = new BaseContainer();
-        private readonly Tabs tabs;
+
+        public readonly ListOf<Project> Projects;
         private readonly TabPage<IWidget> projectsTab;
 
         private readonly State State = LoadState();
-
-        public readonly ListOf<Project> Projects;
+        private readonly Tabs tabs;
         public readonly ListOf<IUser> Users;
 
-        static void Main()
-        {
-            Instance.mainLoop.Start();
-        }
+        private (TabPage tab, Project project)? CurrentProject;
 
         private Program()
         {
@@ -87,7 +84,10 @@ namespace Projecto.Tui
             container.Add(tabs);
         }
 
-        private const string STATE_JSON = "state.json";
+        private static void Main()
+        {
+            Instance.mainLoop.Start();
+        }
 
         private void SaveState()
         {
@@ -118,6 +118,7 @@ namespace Projecto.Tui
                 {
                     Debugger.Break();
                 }
+
                 return new State();
             }
         }
@@ -155,8 +156,6 @@ namespace Projecto.Tui
                 popup.Show(container);
             });
         }
-
-        private (TabPage tab, Project project)? CurrentProject;
 
         private void OpenProject(Project? project)
         {

@@ -1,5 +1,3 @@
-using System;
-
 namespace Projecto.Tui
 {
     public static class ProjectoExtension
@@ -13,7 +11,7 @@ namespace Projecto.Tui
             {
                 TaskStatus.Open => "Открыта",
                 TaskStatus.InProcess => "В работе",
-                TaskStatus.Completed => "Завершена",
+                TaskStatus.Completed => "Завершена"
             };
         }
 

@@ -6,10 +6,39 @@ namespace Projecto.Tui
 {
     public static partial class OpenedExt
     {
+        private static void SetupManyExecutors(this Opened<IHaveManyExecutors> opened)
+        {
+            var context = new ExecutorsContext(opened);
+            opened.content
+                .Add(new Label(""))
+                .Add(new Label("Исполнители:"))
+                .Add(new Button("Добавить").OnClick(() => ExecutorsContext.AskForUser(opened.container, user =>
+                {
+                    if (user != null)
+                    {
+                        context.Executors.Add(user);
+                    }
+                })))
+                .Add(context.Executors.Widget);
+        }
+
+        private static void SetupSingleExecutor(this Opened<IHaveSingleExecutor> opened)
+        {
+            var button = new Button(opened.Object.Executor?.Name ?? "<не назначен>")
+                .OnClick(btn => ExecutorsContext.AskForUser(opened.container, u =>
+                {
+                    opened.Object.Executor = u;
+                    btn.Text = opened.Object.Executor?.Name ?? "<не назначен>";
+                }));
+            opened.content.Add(new StackContainer(Orientation.Horizontal, 1)
+                .Add(new Label("Исполнитель:"))
+                .Add(button));
+        }
+
         private class ExecutorsContext
         {
-            public Opened<IHaveManyExecutors> Opened;
             public readonly ListOf<IUser> Executors;
+            public readonly Opened<IHaveManyExecutors> Opened;
 
             public ExecutorsContext(Opened<IHaveManyExecutors> opened)
             {
@@ -53,35 +82,6 @@ namespace Projecto.Tui
                     .AddClose("Отмена")
                     .Show(root);
             }
-        }
-
-        private static void SetupManyExecutors(this Opened<IHaveManyExecutors> opened)
-        {
-            var context = new ExecutorsContext(opened);
-            opened.content
-                .Add(new Label(""))
-                .Add(new Label("Исполнители:"))
-                .Add(new Button("Добавить").OnClick(() => ExecutorsContext.AskForUser(opened.container, user =>
-                {
-                    if (user != null)
-                    {
-                        context.Executors.Add(user);
-                    }
-                })))
-                .Add(context.Executors.Widget);
-        }
-
-        private static void SetupSingleExecutor(this Opened<IHaveSingleExecutor> opened)
-        {
-            var button = new Button(opened.Object.Executor?.Name ?? "<не назначен>")
-                .OnClick(btn => ExecutorsContext.AskForUser(opened.container, u =>
-                {
-                    opened.Object.Executor = u;
-                    btn.Text = opened.Object.Executor?.Name ?? "<не назначен>";
-                }));
-            opened.content.Add(new StackContainer(Orientation.Horizontal, 1)
-                .Add(new Label("Исполнитель:"))
-                .Add(button));
         }
     }
 }

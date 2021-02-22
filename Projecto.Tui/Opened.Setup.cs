@@ -1,4 +1,3 @@
-using System;
 using Thuja;
 using Thuja.Widgets;
 
@@ -9,18 +8,36 @@ namespace Projecto.Tui
         public static IWidget Setup<T>(this Opened<T> opened)
         {
             if (opened.Cast<ITask>() is { } task)
+            {
                 task.SetupTask();
+            }
+
             if (opened.Cast<Project>() is { } project)
+            {
                 project.SetupProject();
+            }
+
             if (opened.Cast<IUser>() is { } user)
+            {
                 user.SetupUser();
+            }
+
             opened.SetupCloseDelete();
             if (opened.Cast<IHaveSingleExecutor>() is { } singleExecutor)
+            {
                 singleExecutor.SetupSingleExecutor();
+            }
+
             if (opened.Cast<IHaveManyExecutors>() is { } manyExecutors)
+            {
                 manyExecutors.SetupManyExecutors();
+            }
+
             if (opened.Cast<IHaveSubtasks>() is { } subtasks)
+            {
                 subtasks.SetupSubtasks();
+            }
+
             return opened.container;
         }
 

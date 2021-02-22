@@ -9,99 +9,6 @@ namespace Projecto.Tui
 {
     public static partial class OpenedExt
     {
-        private class SubtasksContext
-        {
-            public Opened<IHaveSubtasks> Opened;
-            public ListOf<ITask> Subtasks;
-
-            public SubtasksContext(Opened<IHaveSubtasks> opened)
-            {
-                Opened = opened;
-                Subtasks = new StackContainer(maxVisibleCount: 10).FromList(opened.Object.Subtasks, TaskToWidget);
-            }
-
-            public ImmutableHashSet<TaskStatus> Filter { get; set; } = TaskStatusExt.Statuses.ToImmutableHashSet();
-
-            internal void AddSubtask()
-            {
-                var radios = new RadioSetBuilder<ITaskKind>();
-                foreach (var taskKind in Opened.Object.AllowedSubtasks)
-                {
-                    radios.Add(taskKind.Name, taskKind);
-                }
-
-                var nameField = new InputField();
-                new Popup()
-                    .Add(new Label("Вид задачи:"))
-                    .Add(radios.ToStack())
-                    .Add(new StackContainer(Orientation.Horizontal)
-                        .Add(new Label("Имя: "))
-                        .Add(nameField))
-                    .AddWith(popup => new Button("Создать").OnClick(() =>
-                    {
-                        if (radios.Checked != null)
-                        {
-                            popup.Close();
-                            var name = nameField.Text.ToString();
-                            var subtask = radios.Checked.Create(name);
-                            Subtasks.Add(subtask);
-                        }
-                    }))
-                    .AddClose("Отмена")
-                    .Show(Opened.container);
-            }
-
-            private IWidget TaskToWidget(ITask task)
-            {
-                if (!Filter.Contains(task.TaskStatus))
-                {
-                    return new BaseContainer();
-                }
-
-                var color = task.TaskStatus switch
-                {
-                    TaskStatus.Completed => MyColor.Green,
-                    TaskStatus.InProcess => MyColor.Yellow,
-                    TaskStatus.Open => MyColor.Cyan,
-                    _ => MyColor.Default,
-                };
-                var label = new Label(task.Name)
-                {
-                    CurrentStyle = new Style(color, MyColor.Default)
-                };
-
-                var title = task.Kind.Name;
-                return new Expandable(
-                    new StackContainer(Orientation.Horizontal, 1)
-                        .Add(new Label(title))
-                        .Add(label),
-                    new StackContainer()
-                        .Add(new StackContainer(Orientation.Horizontal, 1)
-                            .Add(new Button(title).OnClick(() => OpenTask(task)))
-                            .Add(label))
-                        .Add(new Label($"   Статус: {task.TaskStatus.RuString()}"))
-                        .Add(new Label($"   Создана: {task.CreatedAt}"))
-                        .AsIKeyHandler()
-                );
-            }
-
-            private void OpenTask(ITask task)
-            {
-                var opened = new Opened<ITask>(Opened.container, task);
-                var widget = opened.Setup();
-                var popup = new Popup().Add(widget);
-                opened.Closed.Value += () =>
-                {
-                    popup.Close();
-                    Subtasks.Update(Subtasks.IndexOf(task));
-                };
-                opened.Deleted.Value += () => Subtasks.Remove(task);
-                popup.Show(opened.root);
-            }
-
-            public string FilterString() => string.Join(", ", Filter.Select(x => x.RuString()));
-        }
-
         private static void SetupSubtasks(this Opened<IHaveSubtasks> opened)
         {
             var context = new SubtasksContext(opened);
@@ -199,6 +106,102 @@ namespace Projecto.Tui
                         }))
                     .Add(new Button("Отмена").OnClick(popup.Close)))
                 .Show(opened.container);
+        }
+
+        private class SubtasksContext
+        {
+            public readonly Opened<IHaveSubtasks> Opened;
+            public readonly ListOf<ITask> Subtasks;
+
+            public SubtasksContext(Opened<IHaveSubtasks> opened)
+            {
+                Opened = opened;
+                Subtasks = new StackContainer(maxVisibleCount: 10).FromList(opened.Object.Subtasks, TaskToWidget);
+            }
+
+            public ImmutableHashSet<TaskStatus> Filter { get; set; } = TaskStatusExt.Statuses.ToImmutableHashSet();
+
+            internal void AddSubtask()
+            {
+                var radios = new RadioSetBuilder<ITaskKind>();
+                foreach (var taskKind in Opened.Object.AllowedSubtasks)
+                {
+                    radios.Add(taskKind.Name, taskKind);
+                }
+
+                var nameField = new InputField();
+                new Popup()
+                    .Add(new Label("Вид задачи:"))
+                    .Add(radios.ToStack())
+                    .Add(new StackContainer(Orientation.Horizontal)
+                        .Add(new Label("Имя: "))
+                        .Add(nameField))
+                    .AddWith(popup => new Button("Создать").OnClick(() =>
+                    {
+                        if (radios.Checked != null)
+                        {
+                            popup.Close();
+                            var name = nameField.Text.ToString();
+                            var subtask = radios.Checked.Create(name);
+                            Subtasks.Add(subtask);
+                        }
+                    }))
+                    .AddClose("Отмена")
+                    .Show(Opened.container);
+            }
+
+            private IWidget TaskToWidget(ITask task)
+            {
+                if (!Filter.Contains(task.TaskStatus))
+                {
+                    return new BaseContainer();
+                }
+
+                var color = task.TaskStatus switch
+                {
+                    TaskStatus.Completed => MyColor.Green,
+                    TaskStatus.InProcess => MyColor.Yellow,
+                    TaskStatus.Open => MyColor.Cyan,
+                    _ => MyColor.Default
+                };
+                var label = new Label(task.Name)
+                {
+                    CurrentStyle = new Style(color, MyColor.Default)
+                };
+
+                var title = task.Kind.Name;
+                return new Expandable(
+                    new StackContainer(Orientation.Horizontal, 1)
+                        .Add(new Label(title))
+                        .Add(label),
+                    new StackContainer()
+                        .Add(new StackContainer(Orientation.Horizontal, 1)
+                            .Add(new Button(title).OnClick(() => OpenTask(task)))
+                            .Add(label))
+                        .Add(new Label($"   Статус: {task.TaskStatus.RuString()}"))
+                        .Add(new Label($"   Создана: {task.CreatedAt}"))
+                        .AsIKeyHandler()
+                );
+            }
+
+            private void OpenTask(ITask task)
+            {
+                var opened = new Opened<ITask>(Opened.container, task);
+                var widget = opened.Setup();
+                var popup = new Popup().Add(widget);
+                opened.Closed.Value += () =>
+                {
+                    popup.Close();
+                    Subtasks.Update(Subtasks.IndexOf(task));
+                };
+                opened.Deleted.Value += () => Subtasks.Remove(task);
+                popup.Show(opened.root);
+            }
+
+            public string FilterString()
+            {
+                return string.Join(", ", Filter.Select(x => x.RuString()));
+            }
         }
     }
 }

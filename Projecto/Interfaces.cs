@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Text.Json.Serialization;
 
 namespace Projecto
 {
     /// <summary>
-    /// Если класс реализует этот интерфейс, то он задача. 
+    /// Если класс реализует этот интерфейс, то он задача.
     /// </summary>
     public interface ITask
     {
@@ -17,7 +15,7 @@ namespace Projecto
     }
 
     /// <summary>
-    /// Означает, что задача может содержать подзадачи. 
+    /// Означает, что задача может содержать подзадачи.
     /// </summary>
     public interface IHaveSubtasks
     {
@@ -94,7 +92,7 @@ namespace Projecto
     }
 
     /// <summary>
-    /// Означает, что задача точно может иметь много исполнителей (в т.ч. больше одного). 
+    /// Означает, что задача точно может иметь много исполнителей (в т.ч. больше одного).
     /// </summary>
     public interface IHaveManyExecutors : IHaveExecutors
     {
@@ -127,7 +125,7 @@ namespace Projecto
     }
 
     /// <summary>
-    /// Означает, что задача может имеет не более одного исполнителя. 
+    /// Означает, что задача может имеет не более одного исполнителя.
     /// </summary>
     /// <remarks>
     /// Если класс имеет не более одного исполнителя, то он очевидно имеет «0 или 1, или много исполнителей».
@@ -196,11 +194,11 @@ namespace Projecto
         /// <summary>
         /// Завершенная задача.
         /// </summary>
-        Completed,
+        Completed
     }
 
     /// <summary>
-    /// Методы для перечисления <see cref="TaskStatus"/>
+    /// Методы для перечисления <see cref="TaskStatus" />
     /// </summary>
     public static class TaskStatusExt
     {

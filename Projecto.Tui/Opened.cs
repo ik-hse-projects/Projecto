@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using Thuja;
 using Thuja.Widgets;
 
@@ -8,12 +7,6 @@ namespace Projecto.Tui
     public class Opened<T>
     {
         internal readonly T Object;
-        internal BaseContainer root { get; private init; }
-        internal BaseContainer container { get; private init; }
-        internal StackContainer content { get; private init; }
-
-        internal Box<Action?> Closed { get; private init; } = new(null);
-        internal Box<Action?> Deleted { get; private init; } = new(null);
 
         public Opened(BaseContainer root, T obj) : this(obj)
         {
@@ -28,6 +21,13 @@ namespace Projecto.Tui
             Object = obj;
         }
 
+        internal BaseContainer root { get; private init; }
+        internal BaseContainer container { get; private init; }
+        internal StackContainer content { get; private init; }
+
+        internal Box<Action?> Closed { get; private init; } = new(null);
+        internal Box<Action?> Deleted { get; private init; } = new(null);
+
         public Opened<T2>? Cast<T2>()
         {
             if (Object is not T2 casted)
@@ -41,7 +41,7 @@ namespace Projecto.Tui
                 content = content,
                 container = container,
                 Closed = Closed,
-                Deleted = Deleted,
+                Deleted = Deleted
             };
         }
     }

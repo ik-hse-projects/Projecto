@@ -1,5 +1,3 @@
-using System.Text.Json.Serialization;
-
 namespace Projecto
 {
     public class StoryFactory : ITaskKind
@@ -7,7 +5,10 @@ namespace Projecto
         public static readonly StoryFactory Instance = new();
         public string Name => "История";
 
-        public ITask Create(string name, TaskStatus taskStatus = default) => new Story(name, taskStatus);
+        public ITask Create(string name, TaskStatus taskStatus = default)
+        {
+            return new Story(name, taskStatus);
+        }
     }
 
     public abstract class TaskFactoryBase<TSelf> : ITaskKind where TSelf : new()
@@ -22,18 +23,29 @@ namespace Projecto
     {
         public override string Name => "Тема";
 
-        public override ITask Create(string name, TaskStatus taskStatus = default) => new Epic(name, taskStatus);
+        public override ITask Create(string name, TaskStatus taskStatus = default)
+        {
+            return new Epic(name, taskStatus);
+        }
     }
 
     public class TaskFactory : TaskFactoryBase<TaskFactory>
     {
         public override string Name => "Задача";
-        public override ITask Create(string name, TaskStatus taskStatus = default) => new Task(name, taskStatus);
+
+        public override ITask Create(string name, TaskStatus taskStatus = default)
+        {
+            return new Task(name, taskStatus);
+        }
     }
 
     public class BugFactory : TaskFactoryBase<BugFactory>
     {
         public override string Name => "Ошибка";
-        public override ITask Create(string name, TaskStatus taskStatus = default) => new Bug(name, taskStatus);
+
+        public override ITask Create(string name, TaskStatus taskStatus = default)
+        {
+            return new Bug(name, taskStatus);
+        }
     }
 }

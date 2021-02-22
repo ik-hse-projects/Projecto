@@ -13,13 +13,33 @@ namespace Projecto
     /// </summary>
     public class State
     {
+        private static readonly JsonSerializerSettings Settings = new()
+        {
+            ContractResolver = new WritablePropertiesOnlyResolver(),
+            PreserveReferencesHandling = PreserveReferencesHandling.All,
+            TypeNameHandling = TypeNameHandling.Auto
+        };
+
+        public List<IUser> Users { get; } = new();
+        public List<Project> Projects { get; } = new();
+
+        public string Serialize()
+        {
+            return JsonConvert.SerializeObject(this, Formatting.Indented, Settings);
+        }
+
+        public static State Deserialize(string data)
+        {
+            return JsonConvert.DeserializeObject<State>(data, Settings) ?? throw new InvalidDataException();
+        }
+
         /// <summary>
-        ///     Мы хотим сериализовывать все поля, корме вида "public Foo Prop => CreateFoo()",
-        ///     т.к. очевидно, что им невозможно никакаим образом присовить значение.
-        ///     Этот класс позволяет это делать!
+        /// Мы хотим сериализовывать все поля, корме вида "public Foo Prop => CreateFoo()",
+        /// т.к. очевидно, что им невозможно никакаим образом присовить значение.
+        /// Этот класс позволяет это делать!
         /// </summary>
         // Основано на: https://stackoverflow.com/a/18548894 и https://stackoverflow.com/a/16506710
-        class WritablePropertiesOnlyResolver : DefaultContractResolver
+        private class WritablePropertiesOnlyResolver : DefaultContractResolver
         {
             protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization)
             {
@@ -48,26 +68,6 @@ namespace Projecto
                         return true;
                     }).ToList();
             }
-        }
-
-        public List<IUser> Users { get; private set; } = new();
-        public List<Project> Projects { get; private set; } = new();
-
-        private static readonly JsonSerializerSettings Settings = new()
-        {
-            ContractResolver = new WritablePropertiesOnlyResolver(),
-            PreserveReferencesHandling = PreserveReferencesHandling.All,
-            TypeNameHandling = TypeNameHandling.Auto,
-        };
-
-        public string Serialize()
-        {
-            return JsonConvert.SerializeObject(this, Formatting.Indented, Settings);
-        }
-
-        public static State Deserialize(string data)
-        {
-            return JsonConvert.DeserializeObject<State>(data, Settings) ?? throw new InvalidDataException();
         }
     }
 }
