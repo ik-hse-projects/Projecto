@@ -20,17 +20,19 @@ namespace Projecto.Tui
             "\n" +
             "Некоторые вещи, которые могут быть не совсем очевидны:\n" +
             "1. Переключаться между вкладками можно нажимая F1-F4 или стрелками влево-вправо, когда это возможно.\n" +
-            "2. В Меню можно корректно выйти из программы.\n" +
+            "2. В Меню можно корректно выйти из программы (сохранив все проекты).\n" +
             "3. Списки умеют прокручиваться. " +
             "Если вы добавили 20 проектов и видите только часть, то надо просто пройтись по списку и всё будет.\n" +
-            "4. Это не приложение на WinForms, мышку можно отложить в сторону.";
+            "4. Если вы переименовываете пользователя, то " +
+            "он будет переименован везде: и в списке пользователей, и во всех проектах.\n" +
+            "5. Это не приложение на WinForms, мышку можно отложить в сторону.";
 
         private readonly MainLoop mainLoop;
         private readonly BaseContainer container = new BaseContainer();
         private readonly Tabs tabs;
         private readonly TabPage<IWidget> projectsTab;
 
-        public State State = new();
+        private readonly State State = LoadState();
 
         public readonly ListOf<Project> Projects;
         public readonly ListOf<IUser> Users;
@@ -63,14 +65,7 @@ namespace Projecto.Tui
                     out projectsTab)
                 .Add("F4|Меню", new StackContainer()
                         .Add(new StackContainer(Orientation.Horizontal, 3)
-                            .Add(new Button("Выйти").OnClick(
-                                () => mainLoop.OnStop = () => { }))
-                            .Add(new Button("Serialize test")
-                                .OnClick(() =>
-                                {
-                                    var s = State.Serialize();
-                                    var de = State.Deserialize(s);
-                                })))
+                            .Add(new Button("Выйти").OnClick(() => mainLoop.OnStop = SaveState)))
                         .Add(new Label(""))
                         .Add(Logo()),
                     out var menuTab);
@@ -92,7 +87,42 @@ namespace Projecto.Tui
             container.Add(tabs);
         }
 
-        private IWidget Logo()
+        private const string STATE_JSON = "state.json";
+
+        private void SaveState()
+        {
+            try
+            {
+                var state = State.Serialize();
+                File.WriteAllText(STATE_JSON, state);
+            }
+            catch (Exception e)
+            {
+                if (Debugger.IsAttached)
+                {
+                    Debugger.Break();
+                }
+            }
+        }
+
+        private static State LoadState()
+        {
+            try
+            {
+                var state = File.ReadAllText(STATE_JSON);
+                return State.Deserialize(state);
+            }
+            catch (Exception e)
+            {
+                if (Debugger.IsAttached)
+                {
+                    Debugger.Break();
+                }
+                return new State();
+            }
+        }
+
+        private static IWidget Logo()
         {
             try
             {

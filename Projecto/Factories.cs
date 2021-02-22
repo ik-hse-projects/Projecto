@@ -2,6 +2,14 @@ using System.Text.Json.Serialization;
 
 namespace Projecto
 {
+    public class StoryFactory : ITaskKind
+    {
+        public static readonly StoryFactory Instance = new();
+        public string Name => "История";
+
+        public ITask Create(string name, TaskStatus taskStatus = default) => new Story(name, taskStatus);
+    }
+
     public abstract class TaskFactoryBase<TSelf> : ITaskKind where TSelf : new()
     {
         public static TSelf Instance = new();

@@ -10,7 +10,7 @@ namespace Projecto
     /// </summary>
     public interface ITask
     {
-        [JsonIgnore] public ITaskKind Kind { get; }
+        public ITaskKind Kind { get; }
         public string Name { get; set; }
         public DateTime CreatedAt { get; set; }
         public TaskStatus TaskStatus { get; set; }
@@ -29,7 +29,6 @@ namespace Projecto
         /// <summary>
         /// Список допустимых подзадач.
         /// </summary>
-        [JsonIgnore]
         public IReadOnlyList<ITaskKind> AllowedSubtasks { get; }
     }
 

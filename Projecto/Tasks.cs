@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Projecto
 {
@@ -21,7 +22,7 @@ namespace Projecto
             CreatedAt = DateTime.Now;
         }
     }
-    
+
     /// <summary>
     /// Задача, по объему работ меньшая, чем Epic. Может быть подзадачей Epic.
     /// </summary>
@@ -34,14 +35,6 @@ namespace Projecto
         }
 
         public override ITaskKind Kind => StoryFactory.Instance;
-    }
-
-    public class StoryFactory : ITaskKind
-    {
-        public static readonly StoryFactory Instance = new();
-        public string Name => "История";
-
-        public ITask Create(string name, TaskStatus taskStatus = default) => new Story(name, taskStatus);
     }
 
     // Все классы ниже тривиально реализуют все перечисленные для них интерфейсы.
