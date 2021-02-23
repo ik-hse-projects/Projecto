@@ -1,8 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Projecto", "Projecto\Projecto.csproj", "{72E2C72F-632A-4E54-A3E8-6B3A238BDCE3}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Projecto.Tui", "Projecto.Tui\Projecto.Tui.csproj", "{2C1B610F-ED52-458D-B778-E0AB4DEF6AF9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Projecto", "Projecto\Projecto.csproj", "{72E2C72F-632A-4E54-A3E8-6B3A238BDCE3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Thuja", "Thuja\Thuja.csproj", "{BB484361-2E94-4344-B90C-13618A50FC23}"
 EndProject

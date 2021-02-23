@@ -14,6 +14,9 @@
     <ItemGroup>
       <None Remove="logo.br" />
       <EmbeddedResource Include="logo.br" />
+      <None Update="state.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>
