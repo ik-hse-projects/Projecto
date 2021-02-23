@@ -12,9 +12,15 @@ namespace Projecto.Tui
     internal class Program
     {
         /// <summary>
+        /// Максимальная ширина разных полей ввода.
+        /// Иначе интерфейс перестаёт влезать на древние терминалы 80x25 символов.
+        /// </summary>
+        internal const int MaxWidth = 60; 
+        
+        /// <summary>
         /// Справка по программе, отображается на первом экране.
         /// </summary>
-        private const string Help =
+        private static readonly string Help =
             "Добро пожаловать в Projecto!\n" +
             "Эта программа самая консольная среди проектоуправляющих и самая проектоуправляющая среди консольных\n" +
             "\n" +
@@ -25,7 +31,8 @@ namespace Projecto.Tui
             "Если вы добавили 20 проектов и видите только часть, то надо просто пройтись по списку и всё будет.\n" +
             "4. Если вы переименовываете пользователя, то " +
             "он будет переименован везде: и в списке пользователей, и во всех проектах.\n" +
-            "5. Это не приложение на WinForms, мышку можно отложить в сторону.";
+            $"5. Максимальная длина полей ввода ограничена {MaxWidth} символами. Это не должно помешать." +
+            "6. Это не приложение на WinForms, мышку можно отложить в сторону.";
 
         /// <summary>
         /// Путь к файлу, в котором сохраняется состояние.
@@ -175,7 +182,7 @@ namespace Projecto.Tui
         /// </summary>
         private IWidget UserToWidget(User user)
         {
-            return new Button(user.Name).OnClick(() =>
+            return new Button(user.Name) {MaxWidth = MaxWidth}.OnClick(() =>
             {
                 var popup = new Popup();
                 var opened = new Opened<User>(user);
@@ -228,7 +235,7 @@ namespace Projecto.Tui
         /// <param name="callback">Функция вызовется, когда пользователб всё введёт и нажмет кнопку.</param>
         private void AskForName(string title, Action<string> callback)
         {
-            var name = new InputField();
+            var name = new InputField {MaxLength = MaxWidth};
             new Popup()
                 .Add(new Label(title))
                 .Add(new StackContainer(Orientation.Horizontal, 1)

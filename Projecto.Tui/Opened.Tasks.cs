@@ -45,7 +45,7 @@ namespace Projecto.Tui
             opened.content
                 .Add(new StackContainer(Orientation.Horizontal, 1)
                     .Add(new Label($"{task.Kind.Name}:"))
-                    .Add(new InputField(task.Name)
+                    .Add(new InputField(task.Name) {MaxLength = Program.MaxWidth}
                         .OnChanged(field => task.Name = field.Text.ToString())))
                 .Add(new StackContainer(Orientation.Horizontal, 1)
                     .Add(new Label("Статус:"))
@@ -170,7 +170,7 @@ namespace Projecto.Tui
                     radios.Add(taskKind.Name, taskKind);
                 }
 
-                var nameField = new InputField();
+                var nameField = new InputField {MaxLength = Program.MaxWidth};
                 new Popup()
                     .Add(new Label("Вид задачи:"))
                     .Add(radios.ToStack())
@@ -216,11 +216,11 @@ namespace Projecto.Tui
                 var title = task.Kind.Name;
                 return new Expandable(
                     new StackContainer(Orientation.Horizontal, 1)
-                        .Add(new Label(title))
+                        .Add(new Label(title) {MaxWidth = Program.MaxWidth})
                         .Add(label),
                     new StackContainer()
                         .Add(new StackContainer(Orientation.Horizontal, 1)
-                            .Add(new Button(title).OnClick(() => OpenTask(task)))
+                            .Add(new Button(title) {MaxWidth = Program.MaxWidth}.OnClick(() => OpenTask(task)))
                             .Add(label))
                         .Add(new Label($"   Статус: {task.TaskStatus.RuString()}"))
                         .Add(new Label($"   Создана: {task.CreatedAt}"))

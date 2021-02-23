@@ -55,7 +55,7 @@ namespace Projecto.Tui
             opened.content
                 .Add(new StackContainer(Orientation.Horizontal)
                     .Add(new Label("Имя:"))
-                    .Add(new InputField(opened.Object.Name)
+                    .Add(new InputField(opened.Object.Name) {MaxLength = Program.MaxWidth}
                         .OnChanged(field => opened.Object.Name = field.Text.ToString())))
                 .Add(new StackContainer());
         }
@@ -68,7 +68,7 @@ namespace Projecto.Tui
             opened.content
                 .Add(new StackContainer(Orientation.Horizontal, 1)
                     .Add(new Label("Проект: "))
-                    .Add(new InputField(opened.Object.Name)
+                    .Add(new InputField(opened.Object.Name) {MaxLength = Program.MaxWidth}
                         .OnChanged(field => opened.Object.Name = field.Text.ToString())));
         }
 

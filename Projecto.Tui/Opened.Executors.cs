@@ -30,7 +30,7 @@ namespace Projecto.Tui
         /// </summary>
         private static void SetupSingleExecutor(this Opened<IHaveSingleExecutor> opened)
         {
-            var button = new Button(opened.Object.Executor?.Name ?? "<не назначен>")
+            var button = new Button(opened.Object.Executor?.Name ?? "<не назначен>") {MaxWidth = Program.MaxWidth}
                 .OnClick(btn => opened.AskForUser(u =>
                 {
                     opened.Object.Executor = u;
@@ -40,7 +40,7 @@ namespace Projecto.Tui
                 .Add(new Label("Исполнитель:"))
                 .Add(button));
         }
-        
+
         /// <summary>
         /// Открывает попап и предлагает человеку выбрать пользователя.
         /// </summary>
@@ -55,6 +55,7 @@ namespace Projecto.Tui
                 }))
                 .Add(new Label(""))
                 .AddWith(popup => new FuzzySearch<User>(Program.Instance.Users, u => u.Name)
+                        {MaxLength = Program.MaxWidth, MaxVisibleCount = 10}
                     .OnChosen(search =>
                     {
                         callback(search.Choice);
@@ -88,7 +89,7 @@ namespace Projecto.Tui
             /// </summary>
             private IWidget ExecutorToWidget(User executor)
             {
-                return new Button(executor.Name)
+                return new Button(executor.Name) {MaxWidth = Program.MaxWidth}
                     .OnClick(() => opened.AskForUser(user =>
                     {
                         if (user == null)
