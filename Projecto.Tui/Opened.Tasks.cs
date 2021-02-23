@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Globalization;
 using System.Linq;
 using Thuja;
 using Thuja.Widgets;
@@ -57,7 +58,7 @@ namespace Projecto.Tui
                             }))))
                 .Add(new StackContainer(Orientation.Horizontal, 1)
                     .Add(new Label("Создана:"))
-                    .Add(new Label(task.CreatedAt.ToString())));
+                    .Add(new Label(task.CreatedAt.ToString(CultureInfo.CurrentCulture))));
         }
 
         /// <summary>

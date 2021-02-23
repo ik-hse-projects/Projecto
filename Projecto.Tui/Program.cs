@@ -31,12 +31,12 @@ namespace Projecto.Tui
         /// Путь к файлу, в котором сохраняется состояние.
         /// </summary>
         private const string STATE_JSON = "state.json";
-        
+
         /// <summary>
         /// Класс Program — Singleton. И вот его единственный экземпляр:
         /// </summary>
         public static readonly Program Instance = new();
-        
+
         /// <summary>
         /// Контейнер, в котором происходит вся отрисовка.
         /// </summary>
@@ -47,9 +47,10 @@ namespace Projecto.Tui
         /// <summary>
         /// Список проектов в интерфейсе.
         /// </summary>
-        public readonly ListOf<Project> Projects;
+        private readonly ListOf<Project> projects;
+
         private readonly TabPage<IWidget> projectsTab;
-        
+
         private readonly State state = LoadState();
         private readonly Tabs tabs;
         public readonly ListOf<User> Users;
@@ -59,7 +60,7 @@ namespace Projecto.Tui
         private Program()
         {
             mainLoop = new MainLoop(container);
-            Projects = new StackContainer(maxVisibleCount: 15).FromList(state.Projects,
+            projects = new StackContainer(maxVisibleCount: 15).FromList(state.Projects,
                 project => new Button(project.Name).OnClick(() => OpenProject(project)));
             Users = new StackContainer(maxVisibleCount: 15).FromList(state.Users, UserToWidget);
             tabs = new Tabs()
@@ -74,8 +75,8 @@ namespace Projecto.Tui
                 .Add("F3|Проекты", new StackContainer(margin: 1)
                         .Add(new Button("Создать").OnClick(
                             () => AskForName("Создание проекта",
-                                name => Projects.Insert(0, new Project(name)))))
-                        .Add(Projects.Widget),
+                                name => projects.Insert(0, new Project(name)))))
+                        .Add(projects.Widget),
                     out projectsTab)
                 .Add("F4|Меню", new StackContainer()
                         .Add(new StackContainer(Orientation.Horizontal, 3)
@@ -89,7 +90,7 @@ namespace Projecto.Tui
             {
                 if (currentProject is var (_, project))
                 {
-                    Projects.Update(Projects.IndexOf(project));
+                    projects.Update(projects.IndexOf(project));
                 }
             };
 
@@ -116,8 +117,8 @@ namespace Projecto.Tui
         {
             try
             {
-                var state = this.state.Serialize();
-                File.WriteAllText(STATE_JSON, state);
+                var saved = this.state.Serialize();
+                File.WriteAllText(STATE_JSON, saved);
             }
             catch (Exception e)
             {
@@ -207,10 +208,10 @@ namespace Projecto.Tui
             else
             {
                 var opened = new Opened<Project>(project);
-                opened.Deleted.Value += () => Projects.Remove(project);
+                opened.Deleted.Value += () => projects.Remove(project);
                 opened.Closed.Value += () =>
                 {
-                    Projects.Update(Projects.IndexOf(project));
+                    projects.Update(projects.IndexOf(project));
                     OpenProject(null);
                 };
                 var widget = opened.Setup();
